@@ -413,6 +413,74 @@
       color: #1E40AF;
     }
 
+    /* Dashboard Action Cards */
+    .dashboard-action-card {
+      background: white;
+      border: 1.5px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      transition: all 0.2s ease-in-out;
+      text-align: right;
+    }
+    .dashboard-action-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(30,58,138,0.12);
+      border-color: var(--primary-light);
+    }
+    .dashboard-action-card .dash-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      background: #EFF6FF;
+      color: var(--primary);
+    }
+    .dashboard-action-card .dash-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .dashboard-action-card .dash-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .profile-hero {
+      background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 8px 20px rgba(30,58,138,0.2);
+    }
+    .profile-hero-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .profile-avatar {
+      width: 52px;
+      height: 52px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+    }
+
     /* Modal dialog */
     .modal-overlay {
       position: fixed;
@@ -526,7 +594,11 @@
 
   <!-- Navigation Tabs -->
   <nav class="nav-tabs" id="main-nav-tabs" style="display:none;">
-    <div class="nav-tab-item active" onclick="switchTab('grades')" id="tab-grades">
+    <div class="nav-tab-item active" onclick="switchTab('dashboard')" id="tab-dashboard">
+      <span class="icon">🏠</span>
+      <span>الرئيسية</span>
+    </div>
+    <div class="nav-tab-item" onclick="switchTab('grades')" id="tab-grades">
       <span class="icon">📝</span>
       <span>العلامات</span>
     </div>
@@ -613,6 +685,124 @@
           <button class="btn btn-secondary btn-block" onclick="openStudentDirectPortal()" style="margin-top: 6px;">
             <span>🔍</span> الانتقال المباشر لاستعلام نتائج الطلاب
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1.5 DASHBOARD VIEW (لوحة التحكم الرئيسية) -->
+    <div id="view-dashboard" style="display:none;">
+      <!-- Profile Header Banner -->
+      <div class="profile-hero">
+        <div class="profile-hero-info">
+          <div class="profile-avatar" id="dash-avatar">👨‍🏫</div>
+          <div>
+            <h2 id="dash-user-name" style="font-size: 1.3rem; font-weight: 800; margin-bottom: 2px;">الأستاذ</h2>
+            <div style="font-size: 0.88rem; opacity: 0.9;" id="dash-user-role-badge">معلم / أستاذ مادة</div>
+            <div style="font-size: 0.82rem; opacity: 0.8; margin-top: 2px;" id="dash-user-code-label">الرمز: -</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary" onclick="logout()" style="background: rgba(255,255,255,0.2); border: none; color: white;">
+          🚪 خروج
+        </button>
+      </div>
+
+      <!-- Teacher Stats Overview (Android parity: only visible for teachers, hidden for admin) -->
+      <div id="dash-teacher-stats" style="margin-bottom: 1.25rem;">
+        <div class="grid-3">
+          <div class="stat-box" style="background: white;">
+            <div style="font-size: 1.5rem; margin-bottom: 4px;">📚</div>
+            <div class="stat-val" id="dash-stat-courses">4 مواد</div>
+            <div class="stat-lbl">المواد المكلف بها</div>
+          </div>
+          <div class="stat-box" style="background: white;">
+            <div style="font-size: 1.5rem; margin-bottom: 4px;">⏱️</div>
+            <div class="stat-val" id="dash-stat-month-hours">18 ساعة</div>
+            <div class="stat-lbl">ساعات الشهر الحالية</div>
+          </div>
+          <div class="stat-box" style="background: white;">
+            <div style="font-size: 1.5rem; margin-bottom: 4px;">📈</div>
+            <div class="stat-val" id="dash-stat-cumul-hours">90 ساعة</div>
+            <div class="stat-lbl">الساعات التراكمية</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Available Services & Functions Grid -->
+      <div style="margin-bottom: 0.75rem; font-weight: 800; font-size: 1.05rem; color: var(--primary);">
+        الخدمات والوظائف المتاحة:
+      </div>
+
+      <div class="grid-2">
+        <!-- 1. Grades (Available to Teachers and Admins) -->
+        <div class="dashboard-action-card" onclick="switchTab('grades')">
+          <div class="dash-icon-box">📝</div>
+          <div>
+            <div class="dash-title">العلامات</div>
+            <div class="dash-desc">إدخال واستعراض درجات الطلاب والسعي والامتحانات</div>
+          </div>
+        </div>
+
+        <!-- 2. Contract Hours (Available to Teachers and Admins) -->
+        <div class="dashboard-action-card" onclick="switchTab('hours')">
+          <div class="dash-icon-box">⏱️</div>
+          <div>
+            <div class="dash-title">ساعات التعاقد</div>
+            <div class="dash-desc">تسجيل الساعات الأسبوعية والشهرية وإجمالي التراكمي</div>
+          </div>
+        </div>
+
+        <!-- 3. Exam Upload (Available to Teachers and Admins) -->
+        <div class="dashboard-action-card" onclick="switchTab('upload')">
+          <div class="dash-icon-box">☁️</div>
+          <div>
+            <div class="dash-title">رفع الامتحانات</div>
+            <div class="dash-desc">رفع نماذج الأسئلة وسلم التصحيح إلى Google Drive</div>
+          </div>
+        </div>
+
+        <!-- 4. Student Reports (ADMIN ONLY) -->
+        <div class="dashboard-action-card admin-only-feature" id="dash-card-reports" onclick="switchTab('reports')">
+          <div class="dash-icon-box" style="background: #FEF3C7; color: #B45309;">📊</div>
+          <div>
+            <div class="dash-title" style="display: flex; align-items: center; gap: 6px;">
+              <span>بطاقات وتقارير الطلاب</span>
+              <span class="badge badge-warning" style="font-size: 0.7rem;">إدارة فقط</span>
+            </div>
+            <div class="dash-desc">عرض بطاقات العلامات الرسمية وحساب النتائج والمعدلات</div>
+          </div>
+        </div>
+
+        <!-- 5. Missing Grades (ADMIN ONLY) -->
+        <div class="dashboard-action-card admin-only-feature" id="dash-card-missing" onclick="switchTab('missing')">
+          <div class="dash-icon-box" style="background: #FEE2E2; color: #B91C1C;">⚠️</div>
+          <div>
+            <div class="dash-title" style="display: flex; align-items: center; gap: 6px;">
+              <span>العلامات الناقصة</span>
+              <span class="badge badge-error" style="font-size: 0.7rem;">إدارة فقط</span>
+            </div>
+            <div class="dash-desc">متابعة الأساتذة والصفوف التي لم تكتمل درجاتها</div>
+          </div>
+        </div>
+
+        <!-- 6. Student Portal Direct QR / Search (ADMIN ONLY on Android dashboard) -->
+        <div class="dashboard-action-card admin-only-feature" id="dash-card-portal" onclick="switchTab('portal')">
+          <div class="dash-icon-box" style="background: #DBEAFE; color: #1D4ED8;">🔍</div>
+          <div>
+            <div class="dash-title" style="display: flex; align-items: center; gap: 6px;">
+              <span>استعلام وبوابة نتائج الطلاب</span>
+              <span class="badge badge-info" style="font-size: 0.7rem;">إدارة فقط</span>
+            </div>
+            <div class="dash-desc">رمز واستعلام مباشر للطلاب لمشاهدة نتائجهم عند إغلاق الامتحانات</div>
+          </div>
+        </div>
+
+        <!-- 7. iOS Web App PWA Info (Available to All) -->
+        <div class="dashboard-action-card" onclick="showIosGuideModal()">
+          <div class="dash-icon-box" style="background: #F3E8FF; color: #7E22CE;">📱</div>
+          <div>
+            <div class="dash-title">تشغيل على iPhone (iOS PWA)</div>
+            <div class="dash-desc">تثبيت واستخدام التطبيق على هواتف الآيفون عبر متصفح Safari</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1325,11 +1515,55 @@
       document.getElementById("header-user-status").textContent = currentUser.name + " (" + (currentUser.isAdmin ? "الإدارة" : "معلم") + ")";
       document.getElementById("btn-logout").style.display = "inline-flex";
 
-      // Show Nav & Grades View
+      // Apply Role-Based Visibility (Parity with Android APK DashboardScreen.kt)
+      applyRolePermissions();
+
+      // Show Nav & Dashboard View
       document.getElementById("view-login").style.display = "none";
       document.getElementById("main-nav-tabs").style.display = "flex";
-      switchTab("grades");
-      loadGradesTable();
+      renderDashboard();
+      switchTab("dashboard");
+    }
+
+    function applyRolePermissions() {
+      var isAdmin = currentUser && currentUser.isAdmin === true;
+
+      // 1. Navigation Tabs: Student Reports, Missing Grades, and Student Portal are Admin only
+      var tabReports = document.getElementById("tab-reports");
+      var tabMissing = document.getElementById("tab-missing");
+      var tabPortal = document.getElementById("tab-portal");
+
+      if (tabReports) tabReports.style.display = isAdmin ? "inline-flex" : "none";
+      if (tabMissing) tabMissing.style.display = isAdmin ? "inline-flex" : "none";
+      if (tabPortal) tabPortal.style.display = isAdmin ? "inline-flex" : "none";
+
+      // 2. Dashboard Action Cards: Admin only items
+      var cardReports = document.getElementById("dash-card-reports");
+      var cardMissing = document.getElementById("dash-card-missing");
+      var cardPortal = document.getElementById("dash-card-portal");
+
+      if (cardReports) cardReports.style.display = isAdmin ? "flex" : "none";
+      if (cardMissing) cardMissing.style.display = isAdmin ? "flex" : "none";
+      if (cardPortal) cardPortal.style.display = isAdmin ? "flex" : "none";
+
+      // 3. Dashboard Teacher Stats: visible for teacher, hidden for admin (matches Android APK DashboardScreen)
+      var teacherStats = document.getElementById("dash-teacher-stats");
+      if (teacherStats) teacherStats.style.display = isAdmin ? "none" : "block";
+    }
+
+    function renderDashboard() {
+      if (!currentUser) return;
+      var isAdmin = currentUser.isAdmin === true;
+
+      var nameEl = document.getElementById("dash-user-name");
+      var roleBadge = document.getElementById("dash-user-role-badge");
+      var codeLabel = document.getElementById("dash-user-code-label");
+      var avatar = document.getElementById("dash-avatar");
+
+      if (nameEl) nameEl.textContent = currentUser.name;
+      if (roleBadge) roleBadge.textContent = isAdmin ? "الإدارة التربوية / مسؤول النظام" : "معلم / أستاذ مادة";
+      if (codeLabel) codeLabel.textContent = isAdmin ? "رمز الدخول الإداري: نشط" : "رمز الأستاذ(ة): " + (currentUser.code || "-");
+      if (avatar) avatar.textContent = isAdmin ? "🏫" : "👨‍🏫";
     }
 
     function logout() {
@@ -1346,7 +1580,7 @@
     }
 
     function hideAllViews() {
-      var views = ["view-grades", "view-hours", "view-upload", "view-reports", "view-missing", "view-portal"];
+      var views = ["view-dashboard", "view-grades", "view-hours", "view-upload", "view-reports", "view-missing", "view-portal"];
       views.forEach(function(v){
         var el = document.getElementById(v);
         if (el) el.style.display = "none";
@@ -1354,8 +1588,16 @@
     }
 
     function switchTab(tab) {
+      // Permission protection: if teacher attempts to open admin-only views, redirect to dashboard
+      if (currentUser && !currentUser.isAdmin) {
+        if (tab === "reports" || tab === "missing" || tab === "portal") {
+          alert("عذراً، هذه الخاصية مخصصة للإدارة التربوية فقط.");
+          tab = "dashboard";
+        }
+      }
+
       hideAllViews();
-      var tabs = ["grades", "hours", "upload", "reports", "missing", "portal"];
+      var tabs = ["dashboard", "grades", "hours", "upload", "reports", "missing", "portal"];
       tabs.forEach(function(t){
         var el = document.getElementById("tab-" + t);
         if (el) {
@@ -1367,6 +1609,7 @@
       var targetView = document.getElementById("view-" + tab);
       if (targetView) targetView.style.display = "block";
 
+      if (tab === "dashboard") renderDashboard();
       if (tab === "grades") loadGradesTable();
       if (tab === "hours") renderHoursData();
       if (tab === "reports") onReportClassChanged();
@@ -1454,8 +1697,23 @@
     function renderHoursData() {
       var tbody = document.getElementById("hours-table-body");
       var html = "";
-      teachersList.filter(function(t){ return !t.isAdmin; }).slice(0, 10).forEach(function(t, idx){
+      var listToShow = [];
+
+      if (currentUser && !currentUser.isAdmin) {
+        // Teacher mode: show only current teacher's hours
+        listToShow = [currentUser];
+      } else {
+        // Admin mode: show all teachers
+        listToShow = teachersList.filter(function(t){ return !t.isAdmin; }).slice(0, 10);
+      }
+
+      var totalMonth = 0;
+      var totalCumul = 0;
+
+      listToShow.forEach(function(t, idx){
         var h = 18 + (idx % 4) * 4;
+        totalMonth += h;
+        totalCumul += (h * 5);
         html += `
           <tr>
             <td><strong>${t.name}</strong></td>
@@ -1469,9 +1727,9 @@
         `;
       });
       tbody.innerHTML = html;
-      document.getElementById("stat-month-hours").textContent = "124 س";
-      document.getElementById("stat-cumul-hours").textContent = "640 س";
-      document.getElementById("stat-training-hours").textContent = "96 س";
+      document.getElementById("stat-month-hours").textContent = totalMonth + " س";
+      document.getElementById("stat-cumul-hours").textContent = totalCumul + " س";
+      document.getElementById("stat-training-hours").textContent = Math.round(totalMonth * 0.4) + " س";
     }
 
     function simulateUpload() {
