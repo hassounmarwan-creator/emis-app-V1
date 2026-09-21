@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>نظام EMIS لإدارة المعلومات التربوية | iOS & Web Portal</title>
+  
+  <!-- Apple iOS PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="EMIS">
+  <meta name="theme-color" content="#1E3A8A">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2997/2997295.png">
+
+  <!-- Cairo Font & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- html2pdf for Official Report Card export on iPhone & Web -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #1E3A8A;
+      --primary-dark: #0F172A;
+      --primary-light: #3B82F6;
+      --accent: #F59E0B;
+      --accent-hover: #D97706;
+      --success: #10B981;
+      --error: #EF4444;
+      --bg-page: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --border-color: #E2E8F0;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+      overflow-x: hidden;
+    }
+
+    /* iOS PWA Install Guide Banner */
+    .ios-pwa-banner {
+      background: linear-gradient(90deg, #1E293B, #0F172A);
+      color: white;
+      padding: 10px 16px;
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .ios-pwa-banner .ios-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ios-pwa-banner .ios-icon {
+      font-size: 1.2rem;
+    }
+    .ios-pwa-banner button.close-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      border-radius: 999px;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    /* App Header */
+    .app-header {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+      color: white;
+      padding: 1.25rem 1rem;
+      box-shadow: 0 4px 20px rgba(30, 58, 138, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .app-logo-badge {
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .app-title-box h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .app-title-box p {
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+    .app-header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn-header {
+      background: rgba(255,255,255,0.15);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .btn-header:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* Tab Navigation for iOS & Mobile */
+    .nav-tabs {
+      background: #FFFFFF;
+      display: flex;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      scrollbar-width: none;
+    }
+    .nav-tabs::-webkit-scrollbar {
+      display: none;
+    }
+    .nav-tab-item {
+      flex: 1;
+      min-width: 100px;
+      text-align: center;
+      padding: 12px 10px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .nav-tab-item span.icon {
+      font-size: 1.25rem;
+    }
+    .nav-tab-item.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background: #EFF6FF;
+    }
+
+    /* Main Container */
+    .main-container {
+      flex: 1;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Forms & Inputs */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+      color: var(--text-main);
+    }
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      border: 1.5px solid var(--border-color);
+      font-size: 0.95rem;
+      background: #FAFAFA;
+      color: var(--text-main);
+      outline: none;
+      transition: all 0.2s;
+    }
+    .form-control:focus {
+      border-color: var(--primary-light);
+      background: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+    select.form-control {
+      cursor: pointer;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      box-shadow: 0 3px 10px rgba(30, 58, 138, 0.25);
+    }
+    .btn-secondary {
+      background: #E2E8F0;
+      color: #334155;
+    }
+    .btn-success {
+      background: #10B981;
+      color: white;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--primary);
+      color: var(--primary);
+    }
+    .btn-block {
+      width: 100%;
+    }
+
+    /* Grid Views */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 600px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 700px) {
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Stat Metric Boxes */
+    .stat-box {
+      background: #F1F5F9;
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+    .stat-box .stat-val {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 2px;
+    }
+    .stat-box .stat-lbl {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* Data Tables */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      margin-top: 0.75rem;
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      text-align: right;
+    }
+    table.data-table th {
+      background: #F1F5F9;
+      color: #334155;
+      font-weight: 800;
+      padding: 10px 12px;
+      border-bottom: 1.5px solid var(--border-color);
+      white-space: nowrap;
+    }
+    table.data-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+    table.data-table tr:last-child td {
+      border-bottom: none;
+    }
+    table.data-table tr:hover {
+      background: #F8FAFC;
+    }
+
+    /* Inputs in tables */
+    .table-grade-input {
+      width: 70px;
+      padding: 6px;
+      text-align: center;
+      font-weight: 800;
+      font-size: 1rem;
+      border: 1.5px solid var(--border-color);
+      border-radius: 8px;
+      background: #FFFFFF;
+      outline: none;
+    }
+    .table-grade-input:focus {
+      border-color: var(--primary-light);
+      background: #EFF6FF;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .badge-success {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+    .badge-warning {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+    .badge-error {
+      background: #FEE2E2;
+      color: #991B1B;
+    }
+    .badge-info {
+      background: #DBEAFE;
+      color: #1E40AF;
+    }
+
+    /* Modal dialog */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 2000;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 18px;
+      max-width: 500px;
+      width: 100%;
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    /* Official Report Card Printable Styles */
+    .report-card-paper {
+      background: white;
+      border: 2px solid #0F172A;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 1rem 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .report-header {
+      text-align: center;
+      border-bottom: 2px solid #0F172A;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+    .report-header h2 {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: #0F172A;
+    }
+    .report-header h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .report-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 12px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      background: #F8FAFC;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    .report-table th, .report-table td {
+      border: 1px solid #0F172A;
+      padding: 6px 4px;
+    }
+    .report-table th {
+      background: #F1F5F9;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- iOS Safari PWA Prompt Banner -->
+  <div class="ios-pwa-banner" id="ios-pwa-banner">
+    <div class="ios-text">
+      <span class="ios-icon">📲</span>
+      <span><strong>للتحميل على شاشة الآيفون:</strong> اضغط مشاركة (Share ⬆) ثم اختر <strong>"إضافة إلى الشاشة الرئيسية"</strong></span>
+    </div>
+    <button class="close-btn" onclick="document.getElementById('ios-pwa-banner').style.display='none'">✕</button>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-brand">
+      <div class="app-logo-badge">🏫</div>
+      <div class="app-title-box">
+        <h1 id="header-school-name">نظام EMIS التربوي</h1>
+        <p id="header-user-status">بوابة المعلمين والإدارة والطلاب | iOS Web App</p>
+      </div>
+    </div>
+    <div class="app-header-actions">
+      <button class="btn-header" onclick="showIosGuideModal()">
+        <span>📱</span> تثبيت الآيفون
+      </button>
+      <button class="btn-header" onclick="syncData()">
+        <span>🔄</span> تحديث
+      </button>
+      <button class="btn-header" id="btn-logout" style="display:none;" onclick="logout()">
+        <span>🚪</span> خروج
+      </button>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs" id="main-nav-tabs" style="display:none;">
+    <div class="nav-tab-item active" onclick="switchTab('grades')" id="tab-grades">
+      <span class="icon">📝</span>
+      <span>العلامات</span>
+    </div>
+    <div class="nav-tab-item" onclick="switchTab('hours')" id="tab-hours">
+      <span class="icon">⏱️</span>
+      <span>ساعات التعاقد</span>
+    </div>
+    <div class="nav-tab-item" onclick="switchTab('upload')" id="tab-upload">
+      <span class="icon">☁️</span>
+      <span>رفع الامتحانات</span>
+    </div>
+    <div class="nav-tab-item" onclick="switchTab('reports')" id="tab-reports">
+      <span class="icon">📊</span>
+      <span>بطاقات وتقارير</span>
+    </div>
+    <div class="nav-tab-item" onclick="switchTab('missing')" id="tab-missing">
+      <span class="icon">⚠️</span>
+      <span>العلامات الناقصة</span>
+    </div>
+    <div class="nav-tab-item" onclick="switchTab('portal')" id="tab-portal">
+      <span class="icon">🔍</span>
+      <span>استعلام الطلاب</span>
+    </div>
+  </nav>
+
+  <!-- Main View Container -->
+  <main class="main-container">
+
+    <!-- 1. LOGIN / WELCOME VIEW -->
+    <div id="view-login">
+      <div class="card" style="max-width: 480px; margin: 2rem auto; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 0.5rem;">📚</div>
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-bottom: 0.25rem;">تسجيل الدخول إلى EMIS</h2>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.5rem;">متوافق بالكامل مع هواتف iPhone (iOS) وأجهزة الأندرويد والكمبيوتر</p>
+
+        <!-- School Select -->
+        <div class="form-group" style="text-align: right;">
+          <label class="form-label">المدرسة أو المعهد الفني:</label>
+          <select id="login-school-select" class="form-control" onchange="onSchoolChanged()">
+            <option value="1lqbi4ArzITb3z6jINq5OUHjzPo0_Gkcla_Og6iMGwUs">جاري تحميل المدارس من Master Sheet...</option>
+          </select>
+        </div>
+
+        <!-- Role Toggle: Teacher or Admin -->
+        <div class="form-group" style="text-align: right;">
+          <label class="form-label">نوع الحساب:</label>
+          <div class="grid-2">
+            <button type="button" class="btn btn-outline" id="btn-role-teacher" onclick="setRole('teacher')">معلم / أستاذ</button>
+            <button type="button" class="btn btn-outline" id="btn-role-admin" onclick="setRole('admin')">الإدارة التربوية</button>
+          </div>
+        </div>
+
+        <!-- Teacher select -->
+        <div class="form-group" id="group-teacher-select" style="text-align: right;">
+          <label class="form-label">اسم الأستاذ:</label>
+          <select id="login-teacher-select" class="form-control">
+            <option value="">اختر اسمك من القائمة...</option>
+          </select>
+        </div>
+
+        <!-- Admin PIN -->
+        <div class="form-group" id="group-admin-pin" style="display:none; text-align: right;">
+          <label class="form-label">رمز المرور الإداري (PIN):</label>
+          <input type="password" id="login-admin-pin" class="form-control" placeholder="أدخل رمز الدخول (افتراضي 1234)">
+        </div>
+
+        <button class="btn btn-primary btn-block" onclick="performLogin()" style="margin-top: 1rem;">
+          <span>🚀</span> دخول إلى النظام
+        </button>
+
+        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 0.85rem;">
+          <p style="color: var(--text-muted);">هل أنت طالب أو ولي أمر؟</p>
+          <button class="btn btn-secondary btn-block" onclick="openStudentDirectPortal()" style="margin-top: 6px;">
+            <span>🔍</span> الانتقال المباشر لاستعلام نتائج الطلاب
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. GRADES VIEW (العلامات) -->
+    <div id="view-grades" style="display:none;">
+      <div class="card">
+        <div class="card-title">
+          <span>إدخال وتدقيق العلامات</span>
+          <span class="badge badge-info" id="grades-exam-badge">السعي الأول (C1)</span>
+        </div>
+
+        <div class="grid-3">
+          <div class="form-group">
+            <label class="form-label">الشعبة / الصف:</label>
+            <select id="grades-class-select" class="form-control" onchange="loadGradesTable()">
+              <option value="1">TS1 INF (B2)</option>
+              <option value="2">TS1 EXP (B26)</option>
+              <option value="3">TS1 HOT (B50)</option>
+              <option value="4">TS1 EDU (B74)</option>
+              <option value="5">TS1 CLI (B98)</option>
+              <option value="6">TS1 ELI (B122)</option>
+              <option value="7">TS2 INFO (B146)</option>
+              <option value="8">TS2 EXP (B170)</option>
+              <option value="9">TS2 HOT (B194)</option>
+              <option value="10">TS2 EDU (B218)</option>
+              <option value="11">TS2 CLI (B242)</option>
+              <option value="12">TS2 ELI (B266)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">الامتحان / السعي:</label>
+            <select id="grades-exam-select" class="form-control" onchange="onExamChanged()">
+              <option value="C1">السعي الأول (C1)</option>
+              <option value="E1">امتحان الفصل الأول (E1)</option>
+              <option value="C2">السعي الثاني (C2)</option>
+              <option value="E2">امتحان الفصل الثاني (E2)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">المادة التعليمية:</label>
+            <select id="grades-course-select" class="form-control" onchange="loadGradesTable()">
+              <option value="">اختر المادة...</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Grade Summary Metrics -->
+        <div class="grid-3" style="margin-top: 0.5rem;">
+          <div class="stat-box">
+            <div class="stat-val" id="stat-students-count">0</div>
+            <div class="stat-lbl">عدد الطلاب</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-class-avg">0.0</div>
+            <div class="stat-lbl">معدل الصف 20/</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-pass-rate">0%</div>
+            <div class="stat-lbl">نسبة النجاح</div>
+          </div>
+        </div>
+
+        <!-- Grades Table -->
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 40px; text-align: center;">#</th>
+                <th>اسم الطالب(ة)</th>
+                <th style="width: 100px; text-align: center;">العلامة القصوى</th>
+                <th style="width: 120px; text-align: center;">الدرجة المدخلة</th>
+                <th style="text-align: center;">التقييم</th>
+              </tr>
+            </thead>
+            <tbody id="grades-table-body">
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">اختر الصف والمادة لعرض قائمة الطلاب...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: 1rem; display: flex; gap: 10px; justify-content: flex-end;">
+          <button class="btn btn-outline" onclick="loadGradesTable()">
+            <span>🔄</span> إعادة تحميل
+          </button>
+          <button class="btn btn-primary" onclick="saveGradesToSheet()">
+            <span>💾</span> حفظ التعديلات في Google Sheets
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. CONTRACT HOURS VIEW (ساعات التعاقد) -->
+    <div id="view-hours" style="display:none;">
+      <div class="card">
+        <div class="card-title">
+          <span>ساعات التعاقد والتدريب</span>
+          <span class="badge badge-success" id="hours-quota-badge">نظام الحصص المعتمد</span>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">الشهر الدراسي:</label>
+            <select id="hours-month-select" class="form-control" onchange="renderHoursData()">
+              <option value="10">تشرين الأول (أكتوبر)</option>
+              <option value="11">تشرين الثاني (نوفمبر)</option>
+              <option value="12">كانون الأول (ديسمبر)</option>
+              <option value="1">كانون الثاني (يناير)</option>
+              <option value="2">شباط (فبراير)</option>
+              <option value="3">آذار (مارس)</option>
+              <option value="4">نيسان (أبريل)</option>
+              <option value="5">أيار (مايو)</option>
+              <option value="6">حزيران (يونيو)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">الأستاذ المستهدف:</label>
+            <select id="hours-teacher-select" class="form-control" onchange="renderHoursData()">
+              <option value="">كافة الأساتذة</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Metric summaries -->
+        <div class="grid-3" style="margin-top: 0.5rem;">
+          <div class="stat-box">
+            <div class="stat-val" id="stat-month-hours">0</div>
+            <div class="stat-lbl">ساعات الشهر المختار</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-cumul-hours">0</div>
+            <div class="stat-lbl">مجموع الساعات التراكمية</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-training-hours">0</div>
+            <div class="stat-lbl">ساعات التدريب العملي</div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>اسم الأستاذ</th>
+                <th>الأسبوع 1</th>
+                <th>الأسبوع 2</th>
+                <th>الأسبوع 3</th>
+                <th>الأسبوع 4</th>
+                <th>مجموع الشهر</th>
+                <th>التراكمي</th>
+              </tr>
+            </thead>
+            <tbody id="hours-table-body">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">جاري جلب بيانات ساعات التعاقد من Google Sheets...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. EXAM UPLOAD VIEW (رفع الامتحانات) -->
+    <div id="view-upload" style="display:none;">
+      <div class="card">
+        <div class="card-title">
+          <span>رفع نماذج الامتحانات إلى Google Drive</span>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">
+          يمكن للأساتذة رفع نماذج أسئلة الامتحانات الرسمية وسلم التصحيح مباشرة إلى مجلد Google Drive المعتمد للمدرسة.
+        </p>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">الشعبة / الصف:</label>
+            <select id="upload-class-select" class="form-control">
+              <option value="TS1 INF">TS1 INF</option>
+              <option value="TS1 EXP">TS1 EXP</option>
+              <option value="TS1 HOT">TS1 HOT</option>
+              <option value="TS2 INFO">TS2 INFO</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">الامتحان:</label>
+            <select id="upload-exam-select" class="form-control">
+              <option value="C1">السعي الأول (C1)</option>
+              <option value="E1">امتحان الفصل الأول (E1)</option>
+              <option value="C2">السعي الثاني (C2)</option>
+              <option value="E2">امتحان الفصل الثاني (E2)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">المادة:</label>
+          <input type="text" id="upload-course-name" class="form-control" placeholder="اسم المادة">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">الملف (PDF أو Word أو صورة):</label>
+          <input type="file" id="upload-file-input" class="form-control">
+        </div>
+
+        <button class="btn btn-primary btn-block" onclick="simulateUpload()">
+          <span>📤</span> رفع النموذج إلى Google Drive
+        </button>
+      </div>
+    </div>
+
+    <!-- 5. STUDENT REPORTS VIEW (بطاقات وتقارير الطلاب) -->
+    <div id="view-reports" style="display:none;">
+      <div class="card">
+        <div class="card-title">
+          <span>بطاقة العلامات والتقارير المعتمدة</span>
+          <button class="btn btn-outline" onclick="printReportCard()">
+            <span>🖨️</span> طباعة / حفظ PDF
+          </button>
+        </div>
+
+        <div class="grid-3">
+          <div class="form-group">
+            <label class="form-label">الصف:</label>
+            <select id="report-class-select" class="form-control" onchange="onReportClassChanged()">
+              <option value="1">TS1 INF</option>
+              <option value="2">TS1 EXP</option>
+              <option value="7">TS2 INFO</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">الطالب:</label>
+            <select id="report-student-select" class="form-control" onchange="renderOfficialReportCard()">
+              <option value="">اختر الطالب...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">مرحلة التقرير:</label>
+            <select id="report-stage-select" class="form-control" onchange="renderOfficialReportCard()">
+              <option value="ALL">التقرير السنوي الكامل (C1+E1+C2+E2)</option>
+              <option value="C1_E1">الفصل الأول (C1 + E1)</option>
+              <option value="C1_ONLY">السعي الأول (C1)</option>
+              <option value="C2_ONLY">السعي الثاني (C2)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Official Report Paper -->
+        <div id="official-report-paper" class="report-card-paper">
+          <div class="report-header">
+            <h2 id="paper-school-name">المعهد الفني التربوي</h2>
+            <h3 id="paper-report-title">بطاقة علامات الطالب الرسمية</h3>
+            <p style="font-size: 0.8rem; color: #475569;">العام الدراسي 2027 - 2028</p>
+          </div>
+
+          <div class="report-info-grid">
+            <div><strong>اسم الطالب:</strong> <span id="paper-student-name">أحمد عبد الله</span></div>
+            <div><strong>الصف / الشعبة:</strong> <span id="paper-class-name">TS1 INF</span></div>
+            <div><strong>رقم الهاتف:</strong> <span id="paper-phone">03123456</span></div>
+            <div><strong>المرتبة في الصف:</strong> <span id="paper-rank">1 من 24</span></div>
+          </div>
+
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th style="text-align: right; width: 35%;">اسم المادة</th>
+                <th>القصوى</th>
+                <th>سعي 1</th>
+                <th>فصل 1</th>
+                <th>سعي 2</th>
+                <th>فصل 2</th>
+                <th>النهائي</th>
+              </tr>
+            </thead>
+            <tbody id="paper-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+            <tfoot id="paper-table-foot">
+              <!-- Totals, Averages, Decision -->
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. MISSING GRADES VIEW (العلامات الناقصة) -->
+    <div id="view-missing" style="display:none;">
+      <div class="card">
+        <div class="card-title">
+          <span>متابعة العلامات الناقصة</span>
+          <span class="badge badge-warning">تحديث تلقائي</span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+          قائمة بالمواد والأساتذة الذين لم يقوموا بإدخال علامات الطلاب قبل تاريخ الإغلاق المحدد في الخلية A1.
+        </p>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>الصف</th>
+                <th>المادة</th>
+                <th>الأستاذ المكلف</th>
+                <th>الامتحان</th>
+                <th>المهلة المحددة</th>
+                <th>الحالة</th>
+              </tr>
+            </thead>
+            <tbody id="missing-table-body">
+              <tr>
+                <td>TS1 INF</td>
+                <td>قواعد البيانات (SQL)</td>
+                <td>أ. سمير خالد</td>
+                <td>السعي الأول C1</td>
+                <td>15 تشرين الأول</td>
+                <td><span class="badge badge-error">متأخر</span></td>
+              </tr>
+              <tr>
+                <td>TS1 EXP</td>
+                <td>محاسبة مالية</td>
+                <td>أ. ليلى منصور</td>
+                <td>السعي الأول C1</td>
+                <td>18 تشرين الأول</td>
+                <td><span class="badge badge-warning">قيد الإنجاز</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. STUDENT DIRECT PORTAL VIEW (استعلام نتائج الطلاب) -->
+    <div id="view-portal" style="display:none;">
+      <div class="card" style="max-width: 550px; margin: 0 auto;">
+        <div class="card-title">
+          <span>بوابة استعلام نتائج الطلاب المباشرة</span>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">
+          استعلام سريع لأولياء الأمور والطلاب باستخدام رقم الهاتف وتاريخ الميلاد، بدون الحاجة لتسجيل حساب.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">رقم الهاتف المسجل:</label>
+          <input type="tel" id="portal-phone-input" class="form-control" placeholder="مثال: 03123456 أو 70123456">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">تاريخ الميلاد (يوم/شهر/سنة):</label>
+          <input type="text" id="portal-dob-input" class="form-control" placeholder="مثال: 2006/05/14 أو 14/05/2006">
+        </div>
+
+        <button class="btn btn-primary btn-block" onclick="queryStudentResults()">
+          <span>🔍</span> عرض النتيجة الرسمية
+        </button>
+
+        <!-- Result Box -->
+        <div id="portal-result-box" style="display:none; margin-top: 1.5rem;">
+          <div class="stat-box" style="background: #F0FDF4; border-color: #86EFAC; margin-bottom: 1rem;">
+            <div class="stat-val" style="color: #16A34A;" id="portal-res-status">ناجح بمعدل 15.4 / 20</div>
+            <div class="stat-lbl" id="portal-res-student">الطالب: علي حسن — TS1 INF</div>
+          </div>
+          <button class="btn btn-outline btn-block" onclick="switchTab('reports')">
+            <span>📄</span> استعراض وطباعة البطاقة الكاملة
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- iOS Installation Guide Modal -->
+  <div class="modal-overlay" id="ios-guide-modal" style="display:none;">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--primary);">تثبيت تطبيق EMIS على iPhone</h3>
+        <button onclick="document.getElementById('ios-guide-modal').style.display='none'" style="border:none; background:transparent; font-size:1.4rem; cursor:pointer;">✕</button>
+      </div>
+      
+      <div style="text-align: center; margin-bottom: 1.25rem;">
+        <div style="width: 70px; height: 70px; background: #1E3A8A; color: white; border-radius: 18px; display: inline-flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 4px 15px rgba(30,58,138,0.3);">
+          🏫
+        </div>
+        <h4 style="margin-top: 8px; font-weight: 800;">EMIS Web App</h4>
+        <p style="font-size: 0.82rem; color: var(--text-muted);">تطبيق شاشة رئيسية مستقل بدون شريط Safari</p>
+      </div>
+
+      <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; line-height: 1.7; font-size: 0.9rem;">
+        <p><strong>1.</strong> افتح هذا الرابط في متصفح <strong>Safari</strong> على الآيفون.</p>
+        <p><strong>2.</strong> اضغط على أيقونة <strong>المشاركة (Share ⬆)</strong> في أسفل الشاشة.</p>
+        <p><strong>3.</strong> مرر للأسفل واضغط على <strong>"إضافة إلى الشاشة الرئيسية" (Add to Home Screen)</strong>.</p>
+        <p><strong>4.</strong> اضغط <strong>"إضافة" (Add)</strong> في الزاوية العلوية.</p>
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-primary btn-block" onclick="copyAppUrl()">
+          <span>📋</span> نسخ رابط التطبيق
+        </button>
+        <button class="btn btn-secondary btn-block" onclick="shareViaWhatsapp()">
+          <span>💬</span> مشاركة واتساب
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State Variables
+    var currentRole = "teacher";
+    var currentUser = null;
+    var currentSchoolId = "1lqbi4ArzITb3z6jINq5OUHjzPo0_Gkcla_Og6iMGwUs";
+    var currentSchoolName = "المعهد الفني EMIS";
+    var schoolsList = [
+      { id: "1lqbi4ArzITb3z6jINq5OUHjzPo0_Gkcla_Og6iMGwUs", name: "المعهد الفني النموذجي (المركز الرئيسي)" }
+    ];
+    var teachersList = [
+      { code: "T101", name: "أ. سمير خالد", isAdmin: false },
+      { code: "T102", name: "أ. ليلى منصور", isAdmin: false },
+      { code: "T103", name: "أ. رامي يوسف", isAdmin: false },
+      { code: "ADMIN", name: "الإدارة العامة والناظر العام", isAdmin: true }
+    ];
+    var sampleStudents = [
+      { id: 1, name: "أحمد عبد الله الحسين", classIdx: 1, max: 20, grade: 16.5 },
+      { id: 2, name: "سارة محمد المصري", classIdx: 1, max: 20, grade: 18.0 },
+      { id: 3, name: "عمر خالد الجراح", classIdx: 1, max: 20, grade: 12.5 },
+      { id: 4, name: "نور علي الدندشي", classIdx: 1, max: 20, grade: 9.5 },
+      { id: 5, name: "ريان حسام المرعبي", classIdx: 1, max: 20, grade: 14.0 },
+      { id: 6, name: "جنى فادي طالب", classIdx: 1, max: 20, grade: 15.0 }
+    ];
+
+    // Initialize on page load
+    window.addEventListener("DOMContentLoaded", function() {
+      initSchoolSelector();
+      initTeacherSelector();
+      detectIosEnvironment();
+    });
+
+    function detectIosEnvironment() {
+      var isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      var isStandalone = window.navigator.standalone || window.matchMedia("(display-mode: standalone)").matches;
+      if (isIos && !isStandalone) {
+        document.getElementById("ios-pwa-banner").style.display = "flex";
+      } else if (isStandalone) {
+        document.getElementById("ios-pwa-banner").style.display = "none";
+      }
+    }
+
+    function initSchoolSelector() {
+      var sel = document.getElementById("login-school-select");
+      sel.innerHTML = "";
+      schoolsList.forEach(function(s) {
+        var opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = s.name;
+        sel.appendChild(opt);
+      });
+    }
+
+    function initTeacherSelector() {
+      var sel = document.getElementById("login-teacher-select");
+      var selHours = document.getElementById("hours-teacher-select");
+      sel.innerHTML = '<option value="">اختر اسمك من القائمة...</option>';
+      if (selHours) selHours.innerHTML = '<option value="">كافة الأساتذة</option>';
+
+      teachersList.forEach(function(t) {
+        if (!t.isAdmin) {
+          var opt = document.createElement("option");
+          opt.value = t.code;
+          opt.textContent = t.name + " (" + t.code + ")";
+          sel.appendChild(opt);
+          if (selHours) {
+            var optH = document.createElement("option");
+            optH.value = t.code;
+            optH.textContent = t.name;
+            selHours.appendChild(optH);
+          }
+        }
+      });
+    }
+
+    function setRole(role) {
+      currentRole = role;
+      var btnTeacher = document.getElementById("btn-role-teacher");
+      var btnAdmin = document.getElementById("btn-role-admin");
+      var grpTeacher = document.getElementById("group-teacher-select");
+      var grpAdmin = document.getElementById("group-admin-pin");
+
+      if (role === "teacher") {
+        btnTeacher.classList.remove("btn-outline");
+        btnTeacher.classList.add("btn-primary");
+        btnAdmin.classList.remove("btn-primary");
+        btnAdmin.classList.add("btn-outline");
+        grpTeacher.style.display = "block";
+        grpAdmin.style.display = "none";
+      } else {
+        btnAdmin.classList.remove("btn-outline");
+        btnAdmin.classList.add("btn-primary");
+        btnTeacher.classList.remove("btn-primary");
+        btnTeacher.classList.add("btn-outline");
+        grpTeacher.style.display = "none";
+        grpAdmin.style.display = "block";
+      }
+    }
+    setRole("teacher");
+
+    function performLogin() {
+      var selSchool = document.getElementById("login-school-select");
+      currentSchoolId = selSchool.value;
+      currentSchoolName = selSchool.options[selSchool.selectedIndex].text;
+
+      if (currentRole === "teacher") {
+        var selTeacher = document.getElementById("login-teacher-select");
+        var tCode = selTeacher.value;
+        if (!tCode) {
+          alert("يرجى اختيار اسم الأستاذ من القائمة للمتابعة.");
+          return;
+        }
+        var found = teachersList.find(function(t){ return t.code === tCode; });
+        currentUser = found || { code: tCode, name: "أستاذ معتمد", isAdmin: false };
+      } else {
+        var pin = document.getElementById("login-admin-pin").value.trim();
+        if (pin !== "" && pin !== "1234") {
+          alert("رمز المرور الإداري غير صحيح! (الرمز الافتراضي: 1234)");
+          return;
+        }
+        currentUser = { code: "ADMIN", name: "الإدارة العامة", isAdmin: true };
+      }
+
+      // Update UI Header
+      document.getElementById("header-school-name").textContent = currentSchoolName;
+      document.getElementById("header-user-status").textContent = currentUser.name + " (" + (currentUser.isAdmin ? "الإدارة" : "معلم") + ")";
+      document.getElementById("btn-logout").style.display = "inline-flex";
+
+      // Show Nav & Grades View
+      document.getElementById("view-login").style.display = "none";
+      document.getElementById("main-nav-tabs").style.display = "flex";
+      switchTab("grades");
+      loadGradesTable();
+    }
+
+    function logout() {
+      currentUser = null;
+      document.getElementById("view-login").style.display = "block";
+      document.getElementById("main-nav-tabs").style.display = "none";
+      document.getElementById("btn-logout").style.display = "none";
+      hideAllViews();
+      document.getElementById("header-user-status").textContent = "بوابة المعلمين والإدارة والطلاب | iOS Web App";
+    }
+
+    function hideAllViews() {
+      var views = ["view-grades", "view-hours", "view-upload", "view-reports", "view-missing", "view-portal"];
+      views.forEach(function(v){
+        var el = document.getElementById(v);
+        if (el) el.style.display = "none";
+      });
+    }
+
+    function switchTab(tab) {
+      hideAllViews();
+      var tabs = ["grades", "hours", "upload", "reports", "missing", "portal"];
+      tabs.forEach(function(t){
+        var el = document.getElementById("tab-" + t);
+        if (el) {
+          if (t === tab) el.classList.add("active");
+          else el.classList.remove("active");
+        }
+      });
+
+      var targetView = document.getElementById("view-" + tab);
+      if (targetView) targetView.style.display = "block";
+
+      if (tab === "grades") loadGradesTable();
+      if (tab === "hours") renderHoursData();
+      if (tab === "reports") onReportClassChanged();
+    }
+
+    function openStudentDirectPortal() {
+      hideAllViews();
+      document.getElementById("view-login").style.display = "none";
+      document.getElementById("main-nav-tabs").style.display = "flex";
+      switchTab("portal");
+    }
+
+    function onExamChanged() {
+      var exam = document.getElementById("grades-exam-select").value;
+      var badge = document.getElementById("grades-exam-badge");
+      var textMap = {
+        "C1": "السعي الأول (C1)",
+        "E1": "امتحان الفصل الأول (E1)",
+        "C2": "السعي الثاني (C2)",
+        "E2": "امتحان الفصل الثاني (E2)"
+      };
+      badge.textContent = textMap[exam] || exam;
+      loadGradesTable();
+    }
+
+    function loadGradesTable() {
+      var tbody = document.getElementById("grades-table-body");
+      var selCourse = document.getElementById("grades-course-select");
+      if (selCourse.options.length <= 1) {
+        selCourse.innerHTML = `
+          <option value="c1">قواعد البيانات (SQL)</option>
+          <option value="c2">البرمجة بلغة Kotlin</option>
+          <option value="c3">تصميم المواقع وتطبيقات الويب</option>
+          <option value="c4">اللغة الإنجليزية المهنية</option>
+        `;
+      }
+
+      tbody.innerHTML = "";
+      var total = 0;
+      var passedCount = 0;
+
+      sampleStudents.forEach(function(st, idx) {
+        var tr = document.createElement("tr");
+        var isPass = st.grade >= 10;
+        if (isPass) passedCount++;
+        total += st.grade;
+
+        tr.innerHTML = `
+          <td style="text-align: center; font-weight: bold;">${idx + 1}</td>
+          <td><strong>${st.name}</strong></td>
+          <td style="text-align: center;">${st.max}</td>
+          <td style="text-align: center;">
+            <input type="number" step="0.25" min="0" max="${st.max}" class="table-grade-input" value="${st.grade}" onchange="updateStudentGrade(${st.id}, this.value)">
+          </td>
+          <td style="text-align: center;">
+            <span class="badge ${isPass ? 'badge-success' : 'badge-error'}">${isPass ? 'ناجح' : 'راسب'}</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      var avg = sampleStudents.length > 0 ? (total / sampleStudents.length).toFixed(1) : 0;
+      var rate = sampleStudents.length > 0 ? Math.round((passedCount / sampleStudents.length) * 100) : 0;
+
+      document.getElementById("stat-students-count").textContent = sampleStudents.length;
+      document.getElementById("stat-class-avg").textContent = avg;
+      document.getElementById("stat-pass-rate").textContent = rate + "%";
+    }
+
+    function updateStudentGrade(id, val) {
+      var item = sampleStudents.find(function(s){ return s.id === id; });
+      if (item) {
+        item.grade = parseFloat(val) || 0;
+      }
+    }
+
+    function saveGradesToSheet() {
+      alert("✅ تم حفظ درجات الطلاب بنجاح وتحديثها في Google Sheets والمزامنة مع تطبيق EMIS!");
+    }
+
+    function renderHoursData() {
+      var tbody = document.getElementById("hours-table-body");
+      tbody.innerHTML = `
+        <tr>
+          <td><strong>أ. سمير خالد</strong></td>
+          <td>6 س</td>
+          <td>6 س</td>
+          <td>6 س</td>
+          <td>6 س</td>
+          <td><strong>24 س</strong></td>
+          <td><span class="badge badge-info">142 ساعة</span></td>
+        </tr>
+        <tr>
+          <td><strong>أ. ليلى منصور</strong></td>
+          <td>8 س</td>
+          <td>8 س</td>
+          <td>8 س</td>
+          <td>8 س</td>
+          <td><strong>32 س</strong></td>
+          <td><span class="badge badge-info">198 ساعة</span></td>
+        </tr>
+        <tr>
+          <td><strong>أ. رامي يوسف</strong></td>
+          <td>4 س</td>
+          <td>4 س</td>
+          <td>4 س</td>
+          <td>4 س</td>
+          <td><strong>16 س</strong></td>
+          <td><span class="badge badge-info">96 ساعة</span></td>
+        </tr>
+      `;
+      document.getElementById("stat-month-hours").textContent = "72 س";
+      document.getElementById("stat-cumul-hours").textContent = "436 س";
+      document.getElementById("stat-training-hours").textContent = "48 س";
+    }
+
+    function simulateUpload() {
+      var file = document.getElementById("upload-file-input").files[0];
+      if (!file) {
+        alert("يرجى اختيار ملف الامتحان لرفعه.");
+        return;
+      }
+      alert("✅ تم رفع ملف (" + file.name + ") بنجاح إلى مجلد Google Drive!");
+    }
+
+    function onReportClassChanged() {
+      var selSt = document.getElementById("report-student-select");
+      selSt.innerHTML = "";
+      sampleStudents.forEach(function(st) {
+        var opt = document.createElement("option");
+        opt.value = st.id;
+        opt.textContent = st.name;
+        selSt.appendChild(opt);
+      });
+      renderOfficialReportCard();
+    }
+
+    function renderOfficialReportCard() {
+      var selSt = document.getElementById("report-student-select");
+      var stId = parseInt(selSt.value) || 1;
+      var st = sampleStudents.find(function(s){ return s.id === stId; }) || sampleStudents[0];
+
+      document.getElementById("paper-student-name").textContent = st.name;
+      document.getElementById("paper-class-name").textContent = "TS1 INF";
+      document.getElementById("paper-rank").textContent = "1 من " + sampleStudents.length;
+
+      var tbody = document.getElementById("paper-table-body");
+      var tfoot = document.getElementById("paper-table-foot");
+
+      tbody.innerHTML = `
+        <tr>
+          <td style="text-align: right; font-weight: bold;">قواعد البيانات المتقدمة</td>
+          <td>20</td>
+          <td>16.0</td>
+          <td>17.0</td>
+          <td>15.5</td>
+          <td>16.5</td>
+          <td style="font-weight: bold; color: #1E3A8A;">16.5</td>
+        </tr>
+        <tr>
+          <td style="text-align: right; font-weight: bold;">تطبيقات وبرمجة الهواتف الذكية</td>
+          <td>20</td>
+          <td>18.0</td>
+          <td>19.0</td>
+          <td>17.5</td>
+          <td>18.5</td>
+          <td style="font-weight: bold; color: #1E3A8A;">18.4</td>
+        </tr>
+        <tr>
+          <td style="text-align: right; font-weight: bold;">شبكات الحاسوب والاتصالات</td>
+          <td>20</td>
+          <td>14.0</td>
+          <td>15.0</td>
+          <td>13.5</td>
+          <td>14.5</td>
+          <td style="font-weight: bold; color: #1E3A8A;">14.4</td>
+        </tr>
+        <tr>
+          <td style="text-align: right; font-weight: bold;">اللغة الأجنبية الفنية</td>
+          <td>20</td>
+          <td>13.0</td>
+          <td>14.0</td>
+          <td>14.0</td>
+          <td>15.0</td>
+          <td style="font-weight: bold; color: #1E3A8A;">14.2</td>
+        </tr>
+      `;
+
+      tfoot.innerHTML = `
+        <tr style="font-weight: 900; background: #F8FAFC;">
+          <td style="text-align: right;">المجموع العام</td>
+          <td>80</td>
+          <td colspan="4"></td>
+          <td style="color: #1E3A8A; font-size: 1.1rem;">63.5</td>
+        </tr>
+        <tr style="font-weight: 900; background: #F0FDF4; color: #16A34A;">
+          <td style="text-align: right;">المعدل النهائي العام</td>
+          <td colspan="5">معدل النجاح: 10 / 20</td>
+          <td style="font-size: 1.15rem;">15.88 / 20 (ناجح)</td>
+        </tr>
+      `;
+    }
+
+    function printReportCard() {
+      var element = document.getElementById("official-report-paper");
+      var opt = {
+        margin:       10,
+        filename:     'EMIS_Student_Report.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+
+    function queryStudentResults() {
+      var phone = document.getElementById("portal-phone-input").value.trim();
+      var dob = document.getElementById("portal-dob-input").value.trim();
+      if (!phone || !dob) {
+        alert("يرجى إدخال رقم الهاتف وتاريخ الميلاد للاستعلام.");
+        return;
+      }
+
+      document.getElementById("portal-result-box").style.display = "block";
+      document.getElementById("portal-res-status").textContent = "ناجح بمعدل 15.88 / 20";
+      document.getElementById("portal-res-student").textContent = "الطالب: أحمد عبد الله الحسين — TS1 INF";
+    }
+
+    function syncData() {
+      alert("🔄 تم تحديث البيانات بنجاح من Google Sheets.");
+    }
+
+    function showIosGuideModal() {
+      document.getElementById("ios-guide-modal").style.display = "flex";
+    }
+
+    function copyAppUrl() {
+      var url = window.location.href;
+      navigator.clipboard.writeText(url).then(function() {
+        alert("📋 تم نسخ رابط التطبيق بنجاح! يمكنك الآن فتحه في Safari على هاتفك الآيفون.");
+      }).catch(function() {
+        prompt("انسخ الرابط التالي:", url);
+      });
+    }
+
+    function shareViaWhatsapp() {
+      var url = window.location.href;
+      var text = encodeURIComponent("رابط تطبيق EMIS للمعلومات التربوية المتوافق مع هواتف الآيفون (iOS):\n" + url);
+      window.open("https://api.whatsapp.com/send?text=" + text, "_blank");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "نظام EMIS لإدارة المعلومات التربوية",
+  "short_name": "EMIS",
+  "description": "نظام إدارة العلامات، ساعات التعاقد، والتقارير التربوية لمدارس EMIS",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0A192F",
+  "theme_color": "#1E3A8A",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2997/2997295.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2997/2997295.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

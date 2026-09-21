@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>بوابة نتائج الطلاب | EMIS School Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    :root {
+      --primary: #1E3A8A;
+      --primary-dark: #172554;
+      --primary-light: #3B82F6;
+      --accent: #D97706;
+      --bg-page: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --border-color: #E2E8F0;
+      --success-bg: #ECFDF5;
+      --success-text: #065F46;
+      --success-border: #A7F3D0;
+      --warning-bg: #FFFBEB;
+      --warning-text: #92400E;
+      --warning-border: #FDE68A;
+      --error-bg: #FEF2F2;
+      --error-text: #991B1B;
+      --error-border: #FECACA;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header-banner {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+      color: white;
+      padding: 2rem 1rem 3rem 1rem;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(30, 58, 138, 0.15);
+    }
+
+    .header-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .header-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 0.25rem;
+      letter-spacing: -0.5px;
+    }
+
+    .header-subtitle {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .container {
+      max-width: 720px;
+      width: 100%;
+      margin: -2rem auto 2rem auto;
+      padding: 0 1rem;
+      flex: 1;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-main);
+    }
+
+    .form-label span.req {
+      color: #EF4444;
+      margin-right: 4px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      border: 1.5px solid var(--border-color);
+      font-size: 1.05rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background-color: #FAFAFA;
+      direction: ltr;
+      text-align: right;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary-light);
+      background-color: #FFF;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    }
+
+    .form-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 1rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(30, 58, 138, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .btn-submit:hover {
+      opacity: 0.95;
+    }
+
+    .btn-submit:active {
+      transform: scale(0.98);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1.25rem;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .alert-error {
+      background: var(--error-bg);
+      color: var(--error-text);
+      border: 1px solid var(--error-border);
+    }
+
+    .alert-info {
+      background: #EFF6FF;
+      color: #1E40AF;
+      border: 1px solid #BFDBFE;
+    }
+
+    .student-badge-card {
+      background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+      color: white;
+      border-radius: 14px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .student-name {
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .student-class {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.18);
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .exam-card {
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+      background: #FFFFFF;
+    }
+
+    .exam-header {
+      padding: 1rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #F1F5F9;
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .exam-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .status-badge {
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-closed {
+      background: var(--success-bg);
+      color: var(--success-text);
+      border: 1px solid var(--success-border);
+    }
+
+    .status-open {
+      background: var(--warning-bg);
+      color: var(--warning-text);
+      border: 1px solid var(--warning-border);
+    }
+
+    .exam-body {
+      padding: 1.25rem;
+    }
+
+    .grades-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+      font-size: 0.92rem;
+    }
+
+    .grades-table th {
+      background: #F8FAFC;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-align: right;
+      padding: 10px;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .grades-table td {
+      padding: 10px;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    .grades-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .grade-val {
+      font-weight: 800;
+      color: var(--primary);
+      direction: ltr;
+      text-align: left;
+      display: inline-block;
+    }
+
+    .exam-summary-bar {
+      margin-top: 1rem;
+      padding: 0.85rem;
+      background: #F8FAFC;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+
+    .summary-item .num {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .summary-item .label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .notice-box {
+      background: var(--warning-bg);
+      border: 1px dashed var(--warning-border);
+      color: var(--warning-text);
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    .notice-box svg {
+      margin-bottom: 6px;
+    }
+
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 3px solid #FFF;
+      width: 22px;
+      height: 22px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .portal-st-btn {
+      min-height: 48px;
+      border-radius: 8px;
+      border: 1.5px solid #CBD5E1;
+      background: #FFFFFF;
+      color: #1E293B;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 6px;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.25;
+      text-align: center;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+    .portal-st-btn.active {
+      background: #1E3A8A !important;
+      color: #FFFFFF !important;
+      border-color: #172554 !important;
+      font-weight: 800 !important;
+    }
+    .portal-st-btn.disabled {
+      background: #F1F5F9 !important;
+      color: #94A3B8 !important;
+      border-color: #E2E8F0 !important;
+      cursor: not-allowed;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .print-btn {
+      background: #334155;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-top: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      background: white;
+      margin-top: auto;
+    }
+
+    @media print {
+      .header-banner, .btn-submit, .form-group, #login-card, .print-btn, footer {
+        display: none !important;
+      }
+      .container {
+        margin: 0;
+        max-width: 100%;
+        padding: 0;
+      }
+      .card {
+        box-shadow: none;
+        border: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-banner">
+    <div class="header-badge">الجمهورية اللبنانية - وزارة التربية والتعليم العالي</div>
+    <h1 class="header-title">بوابة نتائج الطلاب</h1>
+    <p class="header-subtitle">الاستعلام المباشر عن النتائج وكشوف العلامات الرسمية للامتحانات والسعي</p>
+  </header>
+
+  <main class="container">
+    
+    <!-- Login / Query Card -->
+    <div class="card" id="login-card">
+      <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--primary);">استعلام عن كشف العلامات</h2>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+        أدخل رقم الهاتف المكون من 6 أرقام وتاريخ الميلاد المسجلين في بطاقة المدرسة للاطلاع على نتائجك.
+      </p>
+
+      <div id="error-alert" class="alert alert-error" style="display: none;"></div>
+
+      <form id="query-form" onsubmit="handleFormSubmit(event)">
+        <div class="form-group">
+          <label class="form-label" for="phone">رقم الهاتف</label>
+          <input type="text" id="phone" class="form-input" placeholder="أدخل رقم الهاتف" maxlength="15" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="dob">تاريخ الميلاد</label>
+          <input type="text" id="dob" class="form-input" placeholder="DD/MM/YYYY (مثال: 12/04/2002)" maxlength="10" inputmode="numeric" required>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn-submit">
+          <span id="btn-text">Submit</span>
+          <div id="btn-spinner" class="spinner" style="display: none;"></div>
+        </button>
+      </form>
+    </div>
+
+    <!-- Results Container -->
+    <div id="results-container" style="display: none;">
+      <div class="no-print" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px;">
+        <button onclick="resetQuery()" style="background:#475569; color:white; border:none; padding:9px 18px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.95rem;">← استعلام عن طالب آخر</button>
+        <button onclick="downloadCardPdf(event)" style="background:#1E3A8A; color:white; border:none; padding:9px 18px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.95rem;">🖨️ تحميل أو طباعة كشف العلامات (PDF)</button>
+      </div>
+
+      <div class="stage-box no-print" id="portal-stage-box" style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; direction: rtl;">
+        <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 13px; font-weight: 800; color: #1E3A8A;" id="portal-stage-card-title">بطاقة علامات السعي الاول</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+          <button type="button" id="btn-portal-st-c1" class="portal-st-btn active" onclick="switchPortalStage('C1_ONLY')">
+            <span id="portal-lock-c1" style="display:none; font-size:12px;">🔒</span>
+            <span>السعي الأول</span>
+          </button>
+          <button type="button" id="btn-portal-st-c1e1" class="portal-st-btn" onclick="switchPortalStage('C1_E1')">
+            <span id="portal-lock-c1e1" style="display:none; font-size:12px;">🔒</span>
+            <span>الفصل الأول</span>
+          </button>
+          <button type="button" id="btn-portal-st-c2" class="portal-st-btn" onclick="switchPortalStage('C2_ONLY')">
+            <span id="portal-lock-c2" style="display:none; font-size:12px;">🔒</span>
+            <span>السعي الثاني</span>
+          </button>
+          <button type="button" id="btn-portal-st-all" class="portal-st-btn" onclick="switchPortalStage('ALL')">
+            <span id="portal-lock-all" style="display:none; font-size:12px;">🔒</span>
+            <span>التقرير السنوي</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="cert-outer" style="background: #FFFFFF; border: 2px solid #1E293B; border-radius: 10px; padding: 24px; box-shadow: 0 6px 20px rgba(0,0,0,0.06);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+          <div style="text-align: right;">
+            <div style="font-size: 13px; font-weight: 700; color: #0F172A;">الجمهورية اللبنانية</div>
+            <div style="font-size: 13px; font-weight: 700; color: #0F172A; margin-top: 2px;">وزارة التربية و التعليم العالي</div>
+            <div style="font-size: 13px; font-weight: 700; color: #0F172A; margin-top: 2px;">المديرية العامة للتعليم المهني والتقني</div>
+            <div style="font-size: 16px; font-weight: 900; color: #0F172A; margin-top: 4px;" id="portal-school-name"></div>
+          </div>
+          <div style="display: flex; border: 2px solid #1E293B; border-radius: 6px; overflow: hidden; background: #FFFFFF;">
+            <div style="padding: 8px 12px; font-size: 13px; font-weight: 800; color: #0F172A; border-left: 2px solid #1E293B; display: flex; align-items: center; justify-content: center;" id="portal-school-year">2027-2028</div>
+            <div style="padding: 6px 12px; font-size: 13px; font-weight: 900; color: #0F172A; line-height: 1.25; text-align: center;" id="portal-stage-badge">
+              <div>بطاقة</div>
+              <div>علامات</div>
+              <div>الفصل</div>
+              <div>الاول</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border: 1.5px solid #1E293B; border-radius: 6px; margin-bottom: 20px; font-size: 13px; overflow: hidden;">
+          <div style="display: flex; border-bottom: 1.5px solid #1E293B;">
+            <div style="padding: 8px 12px; display: flex; align-items: center; gap: 6px; flex: 1;">
+              <span style="font-weight: 700; color: #334155;">الشهادة و السنة و الاختصاص:</span>
+              <span style="font-weight: 800; color: #0F172A;" id="portal-degree-specialty">الامتياز الفني TS1 - المعلوماتية الإدارية</span>
+            </div>
+          </div>
+          <div style="display: flex;">
+            <div style="padding: 8px 12px; display: flex; align-items: center; gap: 6px; width: 130px; border-left: 1.5px solid #1E293B;">
+              <span style="font-weight: 700; color: #334155;">الصف:</span>
+              <span style="font-weight: 800; color: #0F172A;" id="portal-class">TS1</span>
+            </div>
+            <div style="padding: 8px 12px; display: flex; align-items: center; gap: 6px; width: 110px; border-left: 1.5px solid #1E293B;">
+              <span style="font-weight: 700; color: #334155;">الشعبة:</span>
+              <span style="font-weight: 800; color: #0F172A;" id="portal-section">F1</span>
+            </div>
+            <div style="padding: 8px 12px; display: flex; align-items: center; gap: 6px; flex: 1;">
+              <span style="font-weight: 700; color: #334155;">اسم الطالب:</span>
+              <span style="font-size: 14px; font-weight: 900; color: #1E3A8A;" id="portal-student-name">...</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; border: 1.5px solid #1E293B; font-size: 13px; margin-bottom: 24px;">
+            <thead id="portal-table-head">
+              <tr>
+                <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: right; padding-right: 12px; width: 34%; font-weight: 900;">اسم المادة</th>
+                <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 16%; font-weight: 900;">العلامة القصوى</th>
+                <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 16%; font-weight: 900;">علامة السعي</th>
+                <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 17%; font-weight: 900;">علامة الفصل الاول</th>
+                <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 17%; font-weight: 900;">المعدل النهائي</th>
+              </tr>
+            </thead>
+            <tbody id="portal-table-body"></tbody>
+            <tfoot id="portal-table-foot"></tfoot>
+          </table>
+        </div>
+
+        <div class="cert-sigs" style="display: flex; justify-content: space-between; align-items: flex-start; text-align: center; margin-top: 18px; padding: 0 10px;">
+          <div style="flex: 1;">
+            <div style="font-size: 12px; font-weight: 800; color: #0F172A;">رئيس الدروس النظرية</div>
+          </div>
+          <div style="flex: 1;">
+            <div style="font-size: 12px; font-weight: 800; color: #0F172A;">رئيس الدروس التطبيقية</div>
+          </div>
+          <div style="flex: 1;">
+            <div style="font-size: 12px; font-weight: 800; color: #0F172A;">اسم المدير:</div>
+            <div style="font-size: 10px; color: #64748B; margin-top: 3px;">التوقيع والختم الرسمي</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    نظام الإدارة المدرسية الموحد EMIS © — ربط تلقائي ومباشر مع Google Sheets
+  </footer>
+
+  <script>
+    // Extract parameters from URL if provided
+    function getQueryParam(param) {
+      var urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    var defaultSheetId = getQueryParam("sheetId") || "1bmoxdIJcJ76ILIm3zgLXSgaKhw-GdmLp5cZCEcn6BZM";
+
+    var dobEl = document.getElementById("dob");
+    if (dobEl) {
+      dobEl.addEventListener("input", function() {
+        var v = this.value;
+        var digits = v.replace(/\D/g, "").slice(0, 8);
+        if (digits.length > 4) {
+          this.value = digits.slice(0, 2) + "/" + digits.slice(2, 4) + "/" + digits.slice(4);
+        } else if (digits.length > 2) {
+          this.value = digits.slice(0, 2) + "/" + digits.slice(2);
+        } else {
+          this.value = digits;
+        }
+      });
+    }
+
+    function showError(msg) {
+      var alertBox = document.getElementById("error-alert");
+      alertBox.textContent = msg;
+      alertBox.style.display = "block";
+    }
+
+    function hideError() {
+      var alertBox = document.getElementById("error-alert");
+      alertBox.style.display = "none";
+    }
+
+    function setLoading(isLoading) {
+      var btn = document.getElementById("submit-btn");
+      var text = document.getElementById("btn-text");
+      var spinner = document.getElementById("btn-spinner");
+      btn.disabled = isLoading;
+      text.style.display = isLoading ? "none" : "inline";
+      spinner.style.display = isLoading ? "inline-block" : "none";
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      hideError();
+      var phone = document.getElementById("phone").value.trim();
+      var dob = document.getElementById("dob").value.trim();
+
+      if (!phone || phone.length < 5) {
+        showError("يرجى إدخال رقم الهاتف المكون من 6 أرقام بشكل صحيح.");
+        return;
+      }
+      if (!dob) {
+        showError("يرجى إدخال تاريخ الميلاد.");
+        return;
+      }
+
+      setLoading(true);
+
+      // 1. If running inside Google Apps Script (via google.script.run)
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            setLoading(false);
+            var res = typeof response === 'string' ? JSON.parse(response) : response;
+            if (res.status === 'success') {
+              displayResults(res);
+            } else {
+              showError(res.message || "لم يتم العثور على بيانات الطالب.");
+            }
+          })
+          .withFailureHandler(function(err) {
+            setLoading(false);
+            showError("حدث خطأ في الاتصال بالخادم: " + (err.message || err));
+          })
+          .handleGetStudentGradesJson(phone, dob, defaultSheetId);
+        return;
+      }
+
+      // 2. If running via Web App GET request
+      var webAppUrl = window.location.origin + window.location.pathname;
+      var fetchUrl = webAppUrl + "?action=getStudentGrades&phone=" + encodeURIComponent(phone) + "&dob=" + encodeURIComponent(dob) + "&sheetId=" + encodeURIComponent(defaultSheetId);
+
+      fetch(fetchUrl)
+        .then(function(res) {
+          if (!res.ok) throw new Error("استجابة الخادم غير صالحة (HTTP " + res.status + ")");
+          return res.json();
+        })
+        .then(function(data) {
+          setLoading(false);
+          if (data.status === 'success') {
+            displayResults(data);
+          } else {
+            showError(data.message || "لم يتم العثور على الطالب.");
+          }
+        })
+        .catch(function(err) {
+          // Fallback to client-side Google Sheet CSV query
+          queryGoogleSheetDirect(phone, dob);
+        });
+    }
+
+    // Direct Google Sheets CSV fetcher fallback
+    function queryGoogleSheetDirect(phone, dob) {
+      var sId = defaultSheetId;
+      var settingsUrl = "https://docs.google.com/spreadsheets/d/" + sId + "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent("الإعدادات (التلاميذ)");
+
+      fetch(settingsUrl)
+        .then(function(r) { return r.text(); })
+        .then(function(csvText) {
+          var rows = parseCsv(csvText);
+          var cleanTargetPhone = cleanDigits(phone);
+          var matched = null;
+          var curClass = "";
+
+          for (var i = 0; i < rows.length; i++) {
+            var r = rows[i];
+            var colB = (r[1] || "").trim();
+            var colC = cleanDigits((r[2] || "").trim());
+            var colD = (r[3] || "").trim();
+
+            if (colB !== "" && colC === "") {
+              curClass = colB;
+            }
+
+            if (colB !== "" && colC === cleanTargetPhone && isDobMatch(colD, dob)) {
+              matched = { name: colB, className: curClass, phone: colC, dob: colD };
+              break;
+            }
+          }
+
+          if (!matched) {
+            setLoading(false);
+            showError("لم يتم العثور على طالب يطابق رقم الهاتف (" + phone + ") وتاريخ الميلاد المدخل.");
+            return;
+          }
+
+          // Query exam tabs
+          var examTabs = [
+            { code: "C1", name: "علامات السعي الأول", tab: "علامات السعي الاول" },
+            { code: "E1", name: "علامات الامتحان الأول", tab: "علامات الامتحان الاول" },
+            { code: "C2", name: "علامات السعي الثاني", tab: "علامات السعي الثاني" },
+            { code: "E2", name: "علامات الامتحان الثاني", tab: "علامات الامتحان الثاني" }
+          ];
+
+          var promises = examTabs.map(function(et) {
+            var url = "https://docs.google.com/spreadsheets/d/" + sId + "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(et.tab);
+            return fetch(url)
+              .then(function(r) { return r.text(); })
+              .then(function(csv) {
+                var eRows = parseCsv(csv);
+                var a1 = (eRows[0] && eRows[0][0]) ? eRows[0][0].trim() : "";
+                var isClosed = isExamClosed(a1);
+                var courses = [];
+                var total = 0;
+                var maxTotal = 0;
+
+                if (isClosed) {
+                  var studentRow = null;
+                  var normName = normalizeArabic(matched.name);
+                  var sIdx = -1;
+                  for (var rIdx = 0; rIdx < eRows.length; rIdx++) {
+                    if (eRows[rIdx][1] && normalizeArabic(eRows[rIdx][1]) === normName) {
+                      studentRow = eRows[rIdx];
+                      sIdx = rIdx;
+                      break;
+                    }
+                  }
+
+                  if (studentRow && sIdx !== -1) {
+                    var block = Math.floor(sIdx / 24);
+                    var headerRow = eRows[block * 24 + 2] || [];
+                    var maxRow = eRows[block * 24] || [];
+                    for (var c = 2; c < Math.min(studentRow.length, 27); c++) {
+                      var cName = (headerRow[c] || "").trim();
+                      if (cName && cName !== "المجموع" && cName !== "المعدل" && cName !== "النتيجة") {
+                        var score = parseFloat(studentRow[c]);
+                        var maxScore = parseFloat(maxRow[c]) || 20;
+                        if (!isNaN(score)) total += score;
+                        maxTotal += maxScore;
+                        courses.push({ courseName: cName, score: isNaN(score) ? null : score, maxScore: maxScore });
+                      }
+                    }
+                  }
+                }
+
+                var avg = (maxTotal > 0) ? Math.round((total / maxTotal) * 2000) / 100 : 0;
+                return {
+                  examCode: et.code,
+                  examName: et.name,
+                  deadlineDate: a1,
+                  isClosed: isClosed,
+                  courses: courses,
+                  totalScore: Math.round(total * 100) / 100,
+                  maxTotalScore: Math.round(maxTotal * 100) / 100,
+                  averageScore: avg,
+                  statusMessage: isClosed ? "الامتحان مقفل - النتائج معلنة رسمياً" : "الامتحان غير مقفل بعد. تاريخ إعلان النتائج: " + a1
+                };
+              });
+          });
+
+          Promise.all(promises).then(function(exams) {
+            setLoading(false);
+            displayResults({
+              status: "success",
+              studentName: matched.name,
+              className: matched.className,
+              mobile: matched.phone,
+              dateOfBirth: matched.dob,
+              exams: exams
+            });
+          }).catch(function(err) {
+            setLoading(false);
+            showError("تعذر قراءة بيانات الامتحانات: " + err.message);
+          });
+        })
+        .catch(function(err) {
+          setLoading(false);
+          showError("تعذر الوصول إلى جدول المدرسة: " + err.message);
+        });
+    }
+
+    function fmtVal(val) {
+      if (val === null || val === undefined || isNaN(val)) return "—";
+      var num = Number(val);
+      if (Math.abs(num - Math.round(num)) < 0.001) return num.toString();
+      return num.toFixed(2);
+    }
+
+    var cachedPortalStudentData = null;
+    var currentPortalActiveStage = "AUTO";
+
+    function switchPortalStage(st, force) {
+      if (!cachedPortalStudentData) return;
+      var btnMap = {
+        "C1_ONLY": "btn-portal-st-c1",
+        "C1_E1": "btn-portal-st-c1e1",
+        "C2_ONLY": "btn-portal-st-c2",
+        "ALL": "btn-portal-st-all"
+      };
+      var targetBtn = document.getElementById(btnMap[st]);
+      if (!force && targetBtn && targetBtn.getAttribute("data-locked") === "1") {
+        var dDate = targetBtn.getAttribute("data-deadline") || "";
+        alert("هذا الامتحان غير متاح حتى انقضاء الموعد المحدد" + (dDate ? " (" + dDate + ")" : ""));
+        return;
+      }
+      currentPortalActiveStage = st;
+      Object.keys(btnMap).forEach(function(k){
+        var b = document.getElementById(btnMap[k]);
+        if (b) {
+          if (k === st) b.classList.add("active");
+          else b.classList.remove("active");
+        }
+      });
+      renderPortalStageTable(st);
+    }
+
+    function renderPortalStageTable(st) {
+      if (!cachedPortalStudentData) return;
+      var data = cachedPortalStudentData;
+      var isC1 = (st === "C1_ONLY");
+      var isC1E1 = (st === "C1_E1");
+      var isC2 = (st === "C2_ONLY");
+      var isAll = (st === "ALL");
+
+      var titleMap = {
+        "C1_ONLY": "بطاقة علامات السعي الاول",
+        "C1_E1": "بطاقة علامات الفصل الاول",
+        "C2_ONLY": "بطاقة علامات السعي الثاني",
+        "ALL": "بطاقة علامات الطالب للعام"
+      };
+      var badgeMap = {
+        "C1_ONLY": ["بطاقة", "علامات", "السعي", "الاول"],
+        "C1_E1": ["بطاقة", "علامات", "الفصل", "الاول"],
+        "C2_ONLY": ["بطاقة", "علامات", "السعي", "الثاني"],
+        "ALL": ["بطاقة", "علامات", "التقرير", "السنوي"]
+      };
+
+      var activeTitleEl = document.getElementById("portal-stage-card-title");
+      if (activeTitleEl) activeTitleEl.textContent = titleMap[st] || "بطاقة علامات";
+      var sLines = badgeMap[st] || ["بطاقة", "علامات"];
+      var sHtml = "";
+      sLines.forEach(function(l){ sHtml += "<div>" + l + "</div>"; });
+      var badgeEl = document.getElementById("portal-stage-badge");
+      if (badgeEl) badgeEl.innerHTML = sHtml;
+
+      var thead = document.getElementById("portal-table-head");
+      var tbody = document.getElementById("portal-table-body");
+      var tfoot = document.getElementById("portal-table-foot");
+
+      if (isC1) {
+        thead.innerHTML = `
+          <tr>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: right; padding-right: 12px; width: 32%; font-weight: 900;">اسم المادة</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 17%; font-weight: 900;">العلامة القصوى</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 17%; font-weight: 900;">علامة السعي</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 17%; font-weight: 900;">علامة الفصل الاول</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 17%; font-weight: 900;">المعدل النهائي</th>
+          </tr>
+        `;
+      } else if (isC2) {
+        thead.innerHTML = `
+          <tr>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: right; padding-right: 12px; width: 32%; font-weight: 900;">اسم المادة</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 17%; font-weight: 900;">العلامة القصوى</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 17%; font-weight: 900;">علامة السعي</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 17%; font-weight: 900;">علامة الفصل الثاني</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 17%; font-weight: 900;">المعدل النهائي</th>
+          </tr>
+        `;
+      } else if (isC1E1) {
+        thead.innerHTML = `
+          <tr>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: right; padding-right: 12px; width: 32%; font-weight: 900;">اسم المادة</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 17%; font-weight: 900;">العلامة القصوى</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 17%; font-weight: 900;">علامة السعي</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 17%; font-weight: 900;">علامة الفصل الاول</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 17%; font-weight: 900;">المعدل النهائي</th>
+          </tr>
+        `;
+      } else {
+        thead.innerHTML = `
+          <tr>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: right; padding-right: 12px; width: 26%; font-weight: 900;">اسم المادة</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 12%; font-weight: 900; font-size: 11px;">القصوى</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 12%; font-weight: 900; font-size: 11px;">سعي 1</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 12%; font-weight: 900; font-size: 11px;">فصل 1</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 12%; font-weight: 900; font-size: 11px;">سعي 2</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 12%; font-weight: 900; font-size: 11px;">فصل 2</th>
+            <th style="border: 1px solid #1E293B; padding: 8px 6px; text-align: center; width: 14%; font-weight: 900; font-size: 11px;">النهائي</th>
+          </tr>
+        `;
+      }
+
+      tbody.innerHTML = "";
+      var maxTotal = 0;
+      var c1Total = 0;
+      var e1Total = 0;
+      var c2Total = 0;
+      var e2Total = 0;
+      var finalTotal = 0;
+
+      var courses = data.courses || [];
+      if (courses.length === 0 && data.exams && data.exams.length > 0) {
+        courses = data.exams[0].courses || [];
+      }
+
+      courses.forEach(function(cr, idx) {
+        var tr = document.createElement("tr");
+        if (idx % 2 === 1) tr.style.backgroundColor = "#F8FAFC";
+
+        var cMax = cr.maxScore || 20;
+        maxTotal += cMax;
+
+        var c1 = (cr.c1Score !== null && cr.c1Score !== undefined) ? cr.c1Score : ((cr.score !== undefined) ? cr.score : null);
+        var e1 = (cr.e1Score !== null && cr.e1Score !== undefined) ? cr.e1Score : null;
+        var c2 = (cr.c2Score !== null && cr.c2Score !== undefined) ? cr.c2Score : null;
+        var e2 = (cr.e2Score !== null && cr.e2Score !== undefined) ? cr.e2Score : null;
+
+        if (c1 !== null) c1Total += c1;
+        if (e1 !== null) e1Total += e1;
+        if (c2 !== null) c2Total += c2;
+        if (e2 !== null) e2Total += e2;
+
+        var fin = 0;
+        if (isC1) fin = c1;
+        else if (isC2) fin = c2;
+        else if (isC1E1) fin = (c1 !== null && e1 !== null) ? (c1 * 0.2 + e1 * 0.8) : (c1 || e1);
+        else fin = (c1 || 0) * 0.1 + (e1 || 0) * 0.4 + (c2 || 0) * 0.1 + (e2 || 0) * 0.4;
+
+        if (fin !== null && fin !== undefined) finalTotal += fin;
+
+        if (isC1) {
+          tr.innerHTML = `
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px; font-weight: 800; color: #0F172A;">${cr.courseName}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 700;">${cMax}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 700;">${fmtVal(c1)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 700;"></td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 900; color: #0F172A;">${fmtVal(fin)}</td>
+          `;
+        } else if (isC2) {
+          tr.innerHTML = `
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px; font-weight: 800; color: #0F172A;">${cr.courseName}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 700;">${cMax}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 700;">${fmtVal(c2)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 700;"></td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 900; color: #0F172A;">${fmtVal(fin)}</td>
+          `;
+        } else if (isC1E1) {
+          tr.innerHTML = `
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px; font-weight: 800; color: #0F172A;">${cr.courseName}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 700;">${cMax}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 700;">${fmtVal(c1)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 700;">${fmtVal(e1)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 900; color: #0F172A;">${fmtVal(fin)}</td>
+          `;
+        } else {
+          tr.innerHTML = `
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px; font-weight: 800; color: #0F172A;">${cr.courseName}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 700;">${cMax}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 700;">${fmtVal(c1)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 700;">${fmtVal(e1)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 700;">${fmtVal(c2)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 700;">${fmtVal(e2)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-weight: 900; color: #0F172A;">${fmtVal(fin)}</td>
+          `;
+        }
+        tbody.appendChild(tr);
+      });
+
+      var c1Avg = (maxTotal > 0) ? (c1Total / maxTotal) * 20 : 0;
+      var e1Avg = (maxTotal > 0) ? (e1Total / maxTotal) * 20 : 0;
+      var c2Avg = (maxTotal > 0) ? (c2Total / maxTotal) * 20 : 0;
+      var e2Avg = (maxTotal > 0) ? (e2Total / maxTotal) * 20 : 0;
+      var finalAvg = (maxTotal > 0) ? (finalTotal / maxTotal) * 20 : 0;
+      var isPassed = finalAvg >= 10.0;
+      var resText = isPassed ? "ناجح" : "راسب";
+
+      var totHtml = "";
+      var avgHtml = "";
+      var resHtml = "";
+
+      if (isC1) {
+        totHtml = `
+          <tr style="font-weight: 900;">
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px; font-weight: 900;">المجموع</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${maxTotal}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(c1Total)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;"></td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; color: #DC2626; font-weight: 900; font-size: 14px;">${fmtVal(finalTotal)}</td>
+          </tr>
+        `;
+        avgHtml = `
+          <tr style="font-weight: 900;">
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px; font-weight: 900;">المعدل العام 20/</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-size: 10px; color: #475569;">معدل النجاح: 10 \\ 20</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(c1Avg)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;"></td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; color: ${isPassed ? '#16A34A' : '#DC2626'}; font-weight: 900; font-size: 14px;">${fmtVal(finalAvg)}</td>
+          </tr>
+        `;
+        resHtml = `
+          <tr style="font-weight: 900; background: ${isPassed ? '#F0FDF4' : '#FEF2F2'}; color: ${isPassed ? '#16A34A' : '#DC2626'};">
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px;">النتيجة</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;"></td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${c1Avg >= 10.0 ? 'ناجح' : 'راسب'}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;"></td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${resText}</td>
+          </tr>
+        `;
+      } else if (isC2) {
+        totHtml = `
+          <tr style="font-weight: 900;">
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px; font-weight: 900;">المجموع</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${maxTotal}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(c2Total)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;"></td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; color: #DC2626; font-weight: 900; font-size: 14px;">${fmtVal(finalTotal)}</td>
+          </tr>
+        `;
+        avgHtml = `
+          <tr style="font-weight: 900;">
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px; font-weight: 900;">المعدل العام 20/</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-size: 10px; color: #475569;">معدل النجاح: 10 \\ 20</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(c2Avg)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;"></td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; color: ${isPassed ? '#16A34A' : '#DC2626'}; font-weight: 900; font-size: 14px;">${fmtVal(finalAvg)}</td>
+          </tr>
+        `;
+        resHtml = `
+          <tr style="font-weight: 900; background: ${isPassed ? '#F0FDF4' : '#FEF2F2'}; color: ${isPassed ? '#16A34A' : '#DC2626'};">
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px;">النتيجة</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;"></td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${c2Avg >= 10.0 ? 'ناجح' : 'راسب'}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;"></td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${resText}</td>
+          </tr>
+        `;
+      } else if (isC1E1) {
+        totHtml = `
+          <tr style="font-weight: 900;">
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px; font-weight: 900;">المجموع</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${maxTotal}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(c1Total)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(e1Total)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; color: #DC2626; font-weight: 900; font-size: 14px;">${fmtVal(finalTotal)}</td>
+          </tr>
+        `;
+        avgHtml = `
+          <tr style="font-weight: 900;">
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px; font-weight: 900;">المعدل العام 20/</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-size: 10px; color: #475569;">معدل النجاح: 10 \\ 20</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(c1Avg)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(e1Avg)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; color: ${isPassed ? '#16A34A' : '#DC2626'}; font-weight: 900; font-size: 14px;">${fmtVal(finalAvg)}</td>
+          </tr>
+        `;
+        resHtml = `
+          <tr style="font-weight: 900; background: ${isPassed ? '#F0FDF4' : '#FEF2F2'}; color: ${isPassed ? '#16A34A' : '#DC2626'};">
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px;">النتيجة</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;"></td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${c1Avg >= 10.0 ? 'ناجح' : 'راسب'}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${e1Total > 0 ? (e1Avg >= 10.0 ? 'ناجح' : 'راسب') : ''}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${resText}</td>
+          </tr>
+        `;
+      } else {
+        totHtml = `
+          <tr style="font-weight: 900;">
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px; font-weight: 900;">المجموع</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${maxTotal}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(c1Total)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(e1Total)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(c2Total)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(e2Total)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; color: #DC2626; font-weight: 900; font-size: 14px;">${fmtVal(finalTotal)}</td>
+          </tr>
+        `;
+        avgHtml = `
+          <tr style="font-weight: 900;">
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px; font-weight: 900;">المعدل العام 20/</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; font-size: 10px; color: #475569;">معدل النجاح: 10 \\ 20</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(c1Avg)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(e1Avg)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(c2Avg)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${fmtVal(e2Avg)}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center; color: ${isPassed ? '#16A34A' : '#DC2626'}; font-weight: 900; font-size: 14px;">${fmtVal(finalAvg)}</td>
+          </tr>
+        `;
+        resHtml = `
+          <tr style="font-weight: 900; background: ${isPassed ? '#F0FDF4' : '#FEF2F2'}; color: ${isPassed ? '#16A34A' : '#DC2626'};">
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: right; padding-right: 12px;">النتيجة</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;"></td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${c1Total > 0 ? (c1Avg >= 10.0 ? 'ناجح' : 'راسب') : ''}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${e1Total > 0 ? (e1Avg >= 10.0 ? 'ناجح' : 'راسب') : ''}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${c2Total > 0 ? (c2Avg >= 10.0 ? 'ناجح' : 'راسب') : ''}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${e2Total > 0 ? (e2Avg >= 10.0 ? 'ناجح' : 'راسب') : ''}</td>
+            <td style="border: 1px solid #1E293B; padding: 7px 6px; text-align: center;">${resText}</td>
+          </tr>
+        `;
+      }
+
+      var colSpanTotal = (isC1 || isC2) ? 5 : ((isC1E1) ? 5 : 7);
+      var cs1 = Math.floor(colSpanTotal / 2);
+      var cs2 = colSpanTotal - cs1;
+
+      var rnkHtml = `
+        <tr style="font-weight: 800;">
+          <td colspan="${cs1}" style="border: 1px solid #1E293B; padding: 8px 12px; text-align: right;">عدد الطلاب: <strong>${data.classStudentCount || 24}</strong></td>
+          <td colspan="${cs2}" style="border: 1px solid #1E293B; padding: 8px 12px; text-align: left; color: #1E3A8A;">المرتبة: <strong>${data.rank || 1}</strong></td>
+        </tr>
+      `;
+
+      tfoot.innerHTML = totHtml + avgHtml + resHtml + rnkHtml;
+    }
+
+    function displayResults(data) {
+      cachedPortalStudentData = data;
+      document.getElementById("login-card").style.display = "none";
+      document.getElementById("results-container").style.display = "block";
+
+      document.getElementById("portal-school-name").textContent = data.schoolName || "";
+      document.getElementById("portal-school-year").textContent = data.schoolYear || "2027-2028";
+      var degSpecEl = document.getElementById("portal-degree-specialty");
+      if (degSpecEl) degSpecEl.textContent = data.className || ((data.degreeAndYear ? data.degreeAndYear + " - " : "") + (data.specialty || ""));
+      var degEl = document.getElementById("portal-degree");
+      if (degEl) degEl.textContent = data.degreeAndYear || (data.className || "الامتياز الفني TS1");
+      var specEl = document.getElementById("portal-specialty");
+      if (specEl) specEl.textContent = data.specialty || "المعلوماتية الإدارية";
+      document.getElementById("portal-class").textContent = data.classOnly || (data.className || "TS1");
+      document.getElementById("portal-section").textContent = data.section || "F1";
+      document.getElementById("portal-student-name").textContent = data.studentName || "طالب معتمد";
+
+      var d = data.deadlines || {};
+      var c1Ok = (d.c1Passed !== undefined) ? d.c1Passed : true;
+      var e1Ok = (d.e1Passed !== undefined) ? d.e1Passed : false;
+      var c2Ok = (d.c2Passed !== undefined) ? d.c2Passed : false;
+      var allOk = (d.e2Passed !== undefined) ? d.e2Passed : false;
+
+      // Also check fallback data.exams if present
+      if (!data.deadlines && data.exams && data.exams.length) {
+        data.exams.forEach(function(ex) {
+          if (ex.examCode === "C1") { c1Ok = ex.isClosed; d.c1Date = ex.deadlineDate; }
+          if (ex.examCode === "E1") { e1Ok = ex.isClosed; d.e1Date = ex.deadlineDate; }
+          if (ex.examCode === "C2") { c2Ok = ex.isClosed; d.c2Date = ex.deadlineDate; }
+          if (ex.examCode === "E2") { allOk = ex.isClosed; d.e2Date = ex.deadlineDate; }
+        });
+      }
+
+      if (!c1Ok) {
+        document.getElementById("results-container").style.display = "none";
+        document.getElementById("login-card").style.display = "block";
+        showError("لم يصدر اي تقرير حتى الان");
+        return;
+      }
+
+      function setupStBtn(btnId, lockId, isOk, dDate) {
+        var btn = document.getElementById(btnId);
+        var lk = document.getElementById(lockId);
+        if (!btn) return;
+        if (isOk) {
+          if (lk) lk.style.display = "none";
+          btn.classList.remove("disabled");
+          btn.setAttribute("data-locked", "0");
+        } else {
+          if (lk) lk.style.display = "inline-block";
+          btn.classList.add("disabled");
+          btn.setAttribute("data-locked", "1");
+          btn.setAttribute("data-deadline", dDate || "");
+        }
+      }
+
+      setupStBtn("btn-portal-st-c1", "portal-lock-c1", c1Ok, d.c1Date);
+      setupStBtn("btn-portal-st-c1e1", "portal-lock-c1e1", e1Ok, d.e1Date);
+      setupStBtn("btn-portal-st-c2", "portal-lock-c2", c2Ok, d.c2Date);
+      setupStBtn("btn-portal-st-all", "portal-lock-all", allOk, d.e2Date);
+
+      var initStage = (currentPortalActiveStage && currentPortalActiveStage !== "AUTO") ? currentPortalActiveStage : (data.stage || "C1_ONLY");
+      switchPortalStage(initStage, true);
+    }
+
+    function resetQuery() {
+      document.getElementById("results-container").style.display = "none";
+      document.getElementById("login-card").style.display = "block";
+      document.getElementById("phone").value = "";
+      document.getElementById("dob").value = "";
+      hideError();
+    }
+
+    function downloadCardPdf(event) {
+      var cert = document.querySelector(".cert-container");
+      var s = (document.getElementById("res-school-name") ? document.getElementById("res-school-name").textContent.trim() : "") || "المدرسة";
+      var n = (document.getElementById("res-name") ? document.getElementById("res-name").textContent.trim() : "") || "طالب";
+      var c = (document.getElementById("res-class") ? document.getElementById("res-class").textContent.trim() : "") || "صف";
+      var safeName = n.replace(/[/\\?%*:|"<>]/g, "_").replace(/\s+/g, "_");
+      var fileName = "كشف_علامات_" + safeName + "_" + c + ".pdf";
+
+      var btn = (typeof event !== "undefined" && event && event.currentTarget) ? event.currentTarget : null;
+      var originalHtml = btn ? btn.innerHTML : "";
+      if (btn) {
+        btn.innerHTML = "⏳ جاري تصدير PDF...";
+        btn.style.pointerEvents = "none";
+      }
+
+      function restoreBtn() {
+        if (btn) {
+          btn.innerHTML = originalHtml;
+          btn.style.pointerEvents = "auto";
+        }
+      }
+
+      if (typeof html2pdf !== "undefined" && cert) {
+        var opt = {
+          margin: [3, 3, 3, 3],
+          filename: fileName,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false, scrollY: 0 },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+        };
+        html2pdf().set(opt).from(cert).save().then(function() {
+          restoreBtn();
+        }).catch(function(err) {
+          restoreBtn();
+          window.print();
+        });
+      } else {
+        restoreBtn();
+        window.print();
+      }
+    }
+
+    // Utility functions
+    function cleanDigits(str) {
+      if (!str) return "";
+      var arabicIndic = "٠١٢٣٤٥٦٧٨٩";
+      var res = "";
+      for (var i = 0; i < str.length; i++) {
+        var ch = str.charAt(i);
+        var idx = arabicIndic.indexOf(ch);
+        if (idx !== -1) res += idx;
+        else if (ch >= '0' && ch <= '9') res += ch;
+      }
+      return res;
+    }
+
+    function normalizeArabic(text) {
+      if (!text) return "";
+      return text.toString().trim()
+        .replace(/[أإآٱ]/g, "ا")
+        .replace(/ة/g, "ه")
+        .replace(/ى/g, "ي")
+        .replace(/[\u064B-\u065F\u0670\u0640]/g, "")
+        .replace(/\s+/g, " ");
+    }
+
+    function isDobMatch(sheetDob, inputDob) {
+      if (!sheetDob || !inputDob) return false;
+      var cleanS = cleanDigits(sheetDob);
+      var cleanI = cleanDigits(inputDob);
+      if (cleanS === cleanI && cleanS !== "") return true;
+
+      var sParts = sheetDob.toString().split(/[^0-9]+/).map(function(p){ return parseInt(cleanDigits(p), 10); }).filter(function(n){ return !isNaN(n); });
+      var iParts = inputDob.toString().split(/[^0-9]+/).map(function(p){ return parseInt(cleanDigits(p), 10); }).filter(function(n){ return !isNaN(n); });
+
+      if (sParts.length >= 3 && iParts.length >= 3) {
+        var sSorted = sParts.slice(0, 3).sort(function(a,b){ return a - b; });
+        var iSorted = iParts.slice(0, 3).sort(function(a,b){ return a - b; });
+        if (sSorted.join("-") === iSorted.join("-")) return true;
+      }
+
+      if (cleanI.length === 8 && sParts.length >= 3) {
+        var d1 = parseInt(cleanI.substring(0, 2), 10);
+        var m1 = parseInt(cleanI.substring(2, 4), 10);
+        var y1 = parseInt(cleanI.substring(4), 10);
+        var iArr = [d1, m1, y1].sort(function(a,b){ return a - b; });
+        var sArr = sParts.slice(0, 3).sort(function(a,b){ return a - b; });
+        if (iArr.join("-") === sArr.join("-")) return true;
+      }
+
+      return (sheetDob.toString().indexOf(inputDob.toString()) !== -1 || inputDob.toString().indexOf(sheetDob.toString()) !== -1);
+    }
+
+    function isExamClosed(a1DateStr) {
+      if (!a1DateStr) return false;
+      var clean = cleanDigits(a1DateStr);
+      var parts = a1DateStr.split(/[-/.]/);
+      if (parts.length >= 3) {
+        var y = parseInt(cleanDigits(parts[2]), 10);
+        var m = parseInt(cleanDigits(parts[1]), 10);
+        var d = parseInt(cleanDigits(parts[0]), 10);
+        if (y < 100) y += 2000;
+        var deadline = new Date(y, m - 1, d, 23, 59, 59, 999);
+        return (new Date()).getTime() > deadline.getTime();
+      }
+      return false;
+    }
+
+    function parseCsv(text) {
+      var lines = text.split(/\r\n|\n/);
+      var result = [];
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        if (!line.trim()) continue;
+        var row = [];
+        var inQuotes = false;
+        var cur = "";
+        for (var c = 0; c < line.length; c++) {
+          var ch = line.charAt(c);
+          if (ch === '"') {
+            inQuotes = !inQuotes;
+          } else if (ch === ',' && !inQuotes) {
+            row.push(cur);
+            cur = "";
+          } else {
+            cur += ch;
+          }
+        }
+        row.push(cur);
+        result.push(row);
+      }
+      return result;
+    }
+  </script>
+</body>
+</html>

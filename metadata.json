@@ -1,0 +1,8 @@
+{
+  "name": "8a ios",
+  "description": "ori EMIS 961.lb to t961test to ori",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
