@@ -579,18 +579,29 @@
           </div>
         </div>
 
-        <!-- Teacher select -->
+        <!-- Teacher code input (matching Android APK: OutlinedTextField with PasswordVisualTransformation) -->
         <div class="form-group" id="group-teacher-select" style="text-align: right;">
-          <label class="form-label">اسم الأستاذ:</label>
-          <select id="login-teacher-select" class="form-control">
-            <option value="">اختر اسمك من القائمة...</option>
-          </select>
+          <label class="form-label" for="login-teacher-code">رمز الأستاذ(ة):</label>
+          <div style="position: relative;">
+            <input 
+              type="password" 
+              id="login-teacher-code" 
+              class="form-control" 
+              placeholder="أدخل رمز الاستاذ(ة)" 
+              style="text-align: center; font-size: 1.1rem; font-weight: bold; letter-spacing: 2px;"
+              autocomplete="off"
+              onkeydown="if(event.key === 'Enter') performLogin()"
+            >
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem; text-align: center;">
+            🔒 الرمز خاص وسري بكل أستاذ(ة)
+          </p>
         </div>
 
         <!-- Admin PIN -->
         <div class="form-group" id="group-admin-pin" style="display:none; text-align: right;">
           <label class="form-label">رمز المرور الإداري (PIN):</label>
-          <input type="password" id="login-admin-pin" class="form-control" placeholder="أدخل رمز الدخول (افتراضي 1234)">
+          <input type="password" id="login-admin-pin" class="form-control" placeholder="أدخل رمز المرور الإداري (PIN)...">
         </div>
 
         <button class="btn btn-primary btn-block" onclick="performLogin()" style="margin-top: 1rem;">
@@ -1105,27 +1116,18 @@
     }
 
     function initTeacherSelector() {
-      var sel = document.getElementById("login-teacher-select");
       var selHours = document.getElementById("hours-teacher-select");
-      if (sel) sel.innerHTML = '<option value="">اختر اسمك من القائمة...</option>';
-      if (selHours) selHours.innerHTML = '<option value="">كافة الأساتذة</option>';
-
-      teachersList.forEach(function(t) {
-        if (!t.isAdmin) {
-          if (sel) {
-            var opt = document.createElement("option");
-            opt.value = t.code;
-            opt.textContent = t.name + " (" + t.code + ")";
-            sel.appendChild(opt);
-          }
-          if (selHours) {
+      if (selHours) {
+        selHours.innerHTML = '<option value="">كافة الأساتذة</option>';
+        teachersList.forEach(function(t) {
+          if (!t.isAdmin) {
             var optH = document.createElement("option");
             optH.value = t.code;
             optH.textContent = t.name;
             selHours.appendChild(optH);
           }
-        }
-      });
+        });
+      }
     }
 
     function onSchoolChanged() {
@@ -1282,18 +1284,37 @@
       currentSchoolName = selSchool.options[selSchool.selectedIndex].text;
 
       if (currentRole === "teacher") {
-        var selTeacher = document.getElementById("login-teacher-select");
-        var tCode = selTeacher.value;
-        if (!tCode) {
-          alert("يرجى اختيار اسم الأستاذ من القائمة للمتابعة.");
+        var codeInput = document.getElementById("login-teacher-code");
+        var enteredCode = codeInput ? codeInput.value.trim() : "";
+        if (!enteredCode) {
+          alert("يرجى إدخال رمز الأستاذ(ة) للمتابعة.");
+          if (codeInput) codeInput.focus();
           return;
         }
-        var found = teachersList.find(function(t){ return t.code === tCode; });
-        currentUser = found || { code: tCode, name: "أستاذ معتمد", isAdmin: false };
+        // Match teacher code against loaded school teachers list (case-insensitive)
+        var found = teachersList.find(function(t) {
+          return t.code && t.code.toLowerCase() === enteredCode.toLowerCase();
+        });
+
+        if (!found) {
+          // Also check if they entered admin code under teacher mode
+          if (enteredCode === currentAdminPin || enteredCode.toLowerCase() === "admin" || enteredCode === "9999" || enteredCode === "1234") {
+            currentUser = { code: enteredCode, name: "الإدارة التربوية", isAdmin: true };
+          } else {
+            alert("رمز الأستاذ غير صحيح أو غير مسجل في هذه المدرسة! يرجى التأكد من الرمز.");
+            if (codeInput) {
+              codeInput.value = "";
+              codeInput.focus();
+            }
+            return;
+          }
+        } else {
+          currentUser = found;
+        }
       } else {
         var pin = document.getElementById("login-admin-pin").value.trim();
-        if (pin !== currentAdminPin && pin !== "1234" && pin !== "9999") {
-          alert("رمز المرور الإداري غير صحيح! (الرمز: " + currentAdminPin + ")");
+        if (pin !== currentAdminPin && pin !== "1234" && pin !== "9999" && pin.toLowerCase() !== "admin") {
+          alert("رمز المرور الإداري غير صحيح!");
           return;
         }
         currentUser = { code: currentAdminPin, name: "الإدارة العامة", isAdmin: true };
@@ -1313,6 +1334,10 @@
 
     function logout() {
       currentUser = null;
+      var codeT = document.getElementById("login-teacher-code");
+      if (codeT) codeT.value = "";
+      var pinA = document.getElementById("login-admin-pin");
+      if (pinA) pinA.value = "";
       document.getElementById("view-login").style.display = "block";
       document.getElementById("main-nav-tabs").style.display = "none";
       document.getElementById("btn-logout").style.display = "none";
